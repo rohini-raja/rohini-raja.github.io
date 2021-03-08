@@ -3,13 +3,23 @@ html[data-theme = 'light']
   --bg-col: #fafafa;
   --shadow1: rgba(0, 0, 0, 0.3);
   --shadow2: rgba(0, 0, 0, 0.2);
+
+  --neu-light: white;
+  --neu-dark: #c3c3c3;
+  --neu-color: #c3c3c3;
+  --neu-icon: #c3c3c3;
 }
 
 html[data-theme = 'dark']
 {
-  --bg-col: black;
+  --bg-col: #272727;
   --shadow1: rgba(128, 122, 122, 0.233);
   --shadow2: rgba(231, 216, 216, 0.007);
+
+  --neu-light: #282828;
+  --neu-dark: #080808;
+  --neu-color: white;
+  --neu-icon: whitesmoke;
 }
 
 /*For Changing background color of body according to theme*/
@@ -44,10 +54,35 @@ a:hover {
   margin-bottom: 2rem;
 }
 
-.page-content {
-  padding: 1rem;
-  max-width: 1124px;
-  /* margin: 1rem auto; */
+.NeuInput-outer {
+  display: flex;
+  border-radius: 1rem;
+  background-color: var(--nue-light);
+  padding: 0.5rem;
+  margin-bottom: 3rem;
+  box-shadow: .3rem .3rem .6rem var(--neu-dark), -.2rem -.2rem .5rem var(--neu-light); 
+  margin-left: auto;
+  margin-right: 3rem;
+}
+
+.NeuInput-outer #search {
+  position: absolute;
+  display: flex;
+  align-self: center;
+  fill: var(--neu-icon);
+  margin-left: 1rem;
+}
+
+#myInput {
+  padding: 0.5rem;
+  padding-left: 4rem;
+  border-radius: 1rem;
+  font-size: 1rem;
+  border: none;
+  margin-bottom: 0;
+  box-shadow: inset .2rem .2rem .5rem var(--neu-dark), inset -.2rem -.2rem .5rem var(--neu-light);
+  color: var(--neu-color);
+  outline: none;
 }
 
 @media(min-width: 60rem)
@@ -63,21 +98,15 @@ a:hover {
     transition: width 0.8s;
   }
 
-  .card:hover{
-    width:45%;
-  }
   .column{
     margin-left: 1.5rem;
   }
 }
 
 .card .menu-content {
-  margin: 0;
-  padding: 0;
   list-style-type: none;
   position: absolute;
-  float: left;
-  vertical-align: bottom;
+  right: 0;
 }
 
 .card .menu-content::before,
@@ -96,6 +125,8 @@ a:hover {
 
 .card .wrapper {
   background-color: #fff;
+  border: 0;
+  border-radius: 10px;
   min-height: 24rem;
   position: relative;
   overflow: hidden;
@@ -131,7 +162,7 @@ a:hover {
 @media(min-width: 378px)
 {
   .card .data .content{
-    margin-bottom: 1em;
+    margin-bottom: 2em;
   }
 }
 
@@ -145,7 +176,7 @@ a:hover {
 @media(min-width: 60rem)
 {
   .card .data .content{
-    margin-bottom: 0;
+    margin-bottom: 2em;
   }
 }
 
@@ -153,6 +184,11 @@ a:hover {
   width: 100%;
   height: 25%;
   margin: 0;
+}
+@media (max-width:400px){
+  .content .title-div{
+    margin-bottom:3em ;
+  }
 }
 
 @media(min-width: 60rem)
@@ -162,12 +198,27 @@ a:hover {
   }
 }
 
+@media(min-width: 40rem)
+{
+  .card .title-div{
+    padding-bottom: 2.8rem;
+  }
+}
+
+@media(min-width: 20rem)
+{
+  .card .title-div{
+    padding-bottom: 2.8rem;
+  }
+}
+
+
 .card .title {
   margin-top: 0em;
   font-size: 0.65em;
 }
 
-@media(min-width: 311px)
+@media(min-width: 411px)
 {
   .card .title{
     font-size: 0.8em;
@@ -237,10 +288,33 @@ a:hover {
 }
 
 .tagbutton{
-  background-color: lawngreen;
-  border-radius: 10px;
+  background-color: #b6bcebfd;
+  color: #0117E7;
+  margin-top: 8px;
+  margin-right: 11px;
+  border-radius: 100px;
   border:none;
+  overflow:hidden;
+  padding: 5px 10px;
+  font-size: .85rem;
+  font-weight: bold;
 }
+
+.tagbutton:focus{
+  outline: none;
+}
+
+.tagbutton span {
+  padding-right: 5.5px;
+}
+
+.tagimg {
+  width: 2rem;
+  margin: auto 0;
+  outline: none;
+  margin-left: -8px;
+}
+
 .card input[type="checkbox"] {
   display: none;
 }
@@ -256,6 +330,12 @@ input[type="text"]{
 .skill-card .wrapper:hover .menu-content span {
   transform: translate(-50%, -10px);
   opacity: 1;
+}
+
+.skill-card {
+  width: 450px;
+  border: 0;
+  border-radius: 10px;
 }
 
 .skill-card .header {
@@ -294,6 +374,7 @@ input[type="text"]{
 
 .skill-card .data {
   color: #fff;
+  background-color: rgba(0,0,0,0.55);
   transform: translateY(calc(60px + 4em));
   padding: 5px;
 }
@@ -302,16 +383,147 @@ input[type="text"]{
   color: #fff;
 }
 
+
 /*social icons*/
 
+ul{
+  padding-inline-start: 0px;
+}
+
 .social-icon svg {
-  margin-top: 4px;
+  margin-top: 30px;
+}
+
+.menu-content{
+  margin-right: 10px;
 }
 .social-icon svg:hover {
   fill: #fff;
 }
 
-/* Resopnsive*/
+.project-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 5%;
+}
+
+.page-content {
+  padding: 1rem;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  /* margin: 1rem auto; */
+}
+
+/* Responsive*/
+
+@media only screen and (max-width: 970px) {
+  .social-icon svg {
+    margin-top: -10px;
+  }
+  .tagbutton{
+    font-size: .90rem;
+  }
+
+  .card .title-div{
+    padding-bottom: 2rem;
+    margin-bottom: 0px;
+    font-size: 2rem;
+  }
+}
+
+
+@media only screen and (max-width: 768px) {
+  .social-icon svg {
+    margin-top: -10px;
+  }
+  .tagbutton{
+    font-size: .90rem;
+  }
+
+  .card .title-div{
+    padding-bottom: 2rem;
+    margin-bottom: 0px;
+    font-size: 2rem;
+  }
+}
+
+@media only screen and (max-width: 419px) {
+  .social-icon svg {
+    margin-top: -10px;
+  }
+  .menu-content{
+    margin-right: 20px;
+  }
+  .tagbutton{
+    margin-bottom: -1px;
+    font-size: .90rem;
+  }
+  .card .title-div{
+    padding-bottom: 2rem;
+    margin-bottom: 0px;
+    font-size: 2rem;
+  }
+}
+
+@media only screen and (max-width: 380px) {
+  .menu-content{
+    margin-top: -10px;
+    margin-right: 20px;
+  }
+  .tagbutton{
+    margin-bottom: -2px;
+    font-size: .80rem;
+  }
+  .card .title-div{
+    font-size: 3rem;
+  }
+}
+
+@media only screen and (max-width: 340px) {
+  .menu-content{
+    margin-top: -10px;
+    margin-right:20px;
+  }
+  .tagbutton{
+    margin-bottom: -2px;
+    font-size: .70rem;
+  }
+}
+
+@media only screen and (max-width: 305px) {
+  .menu-content{
+    margin-top:-20px;
+    margin-right: 20px;
+  }
+  .tagbutton{
+    font-size: .40rem;
+
+  }
+}
+
+@media only screen and (max-width: 280px) {
+  .social-icon svg {
+    margin-top: -20px;
+  }
+  .tagbutton{
+    font-size: .60rem;
+  }
+
+  .menu-content{
+    margin-top:-20px;
+    margin-right: 20px;
+  }
+
+  .card .title-div{
+    padding-bottom: 2rem;
+    margin-bottom: 0px;
+    font-size: 2rem;
+  }
+}
+
 @media only screen and (max-width: 767px) {
   .project-box {
     margin-top: 18rem;
@@ -324,28 +536,20 @@ input[type="text"]{
   }
 }
 
-@media (min-width: 600px) {
-  .page-content {
-    grid-template-columns: repeat(2, 1fr);
+@media only screen and (max-width: 702px) {
+  .NeuInput-outer {
+    margin: -1.5rem 0.3rem 3rem 0.3rem;
   }
 }
-
-@media (min-width: 800px) {
-  .page-content {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 800px) {
-	.skill-card .data {
-		transform: translateY(calc(0px));
-	  }
-  }
 
 @media (max-width: 377px) {
 	.skill-card .data {
 		transform: translateY(calc(90px + 4em));
-	  }
+    }
+    
+    .social-icon svg {
+      margin-top: 20px;
+    }
   }
   @media (min-width: 960px) {
     .skill-card .data {
@@ -354,3 +558,353 @@ input[type="text"]{
       padding: 5px;
     }
 }
+.main{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content: center;
+}
+
+.left {
+  position: relative;
+}
+
+.right {
+  position: relative;
+}
+
+
+@media screen and (max-width:480px){
+  .main {
+      display: flex;
+      flex-direction: column-reverse;
+  }
+}
+
+
+
+/*
+----------------------------
+SVG ANIMATIONS PROJECT PAGE
+----------------------------
+*/
+
+@keyframes ekumanslidein {
+    0% {
+      transform: translateX(-600px)
+    }
+
+    50% {
+      transform: translateX(-600px) scaleX(1)
+    }
+
+    75% {
+      transform: translateX(30px) scaleX(.9)
+    }
+
+    87.5% {
+      transform: translateX(-5px)
+    }
+
+    97% {
+      transform: translateX(3px)
+    }
+
+    to {
+      transform: translateX(0) scaleX(1)
+    }
+  }
+
+  @keyframes ekumanarmrotate {
+
+    0%,
+    45%,
+    65%,
+    85%,
+    to {
+      transform: rotate(0deg)
+    }
+
+    55%,
+    75% {
+      transform: rotate(-5deg)
+    }
+  }
+
+  @keyframes ekumanhairwobble {
+
+    50%,
+    to {
+      transform: scaleX(1)
+    }
+
+    75% {
+      transform: scaleX(1.2)
+    }
+
+    87.5% {
+      transform: scaleX(.8)
+    }
+
+    97% {
+      transform: scaleX(1.09)
+    }
+  }
+
+  @keyframes ekuwomanlidein {
+    0% {
+      transform: translateX(600px)
+    }
+
+    50% {
+      transform: translateX(600px) scaleX(1)
+    }
+
+    75% {
+      transform: translateX(-30px) scaleX(.9)
+    }
+
+    87.5% {
+      transform: translateX(5px)
+    }
+
+    97% {
+      transform: translateX(-3px)
+    }
+
+    to {
+      transform: translateX(0) scaleX(1)
+    }
+  }
+
+  @keyframes kulapdropin {
+    0% {
+      transform: translateY(-230px) scale(0) rotate(0deg)
+    }
+
+    35% {
+      transform: translateY(-230px) scale(1.03) rotate(20deg)
+    }
+
+    45% {
+      transform: rotate(10deg)
+    }
+
+    50% {
+      transform: translateY(-5px) scale(.98) rotate(0deg)
+    }
+
+    55% {
+      transform: translateY(-10px) scale(1.01) rotate(0deg)
+    }
+
+    60% {
+      transform: translateY(0) scale(1)
+    }
+
+    to {
+      transform: translateY(0)
+    }
+  }
+
+  @keyframes ekuwomanarmrotate {
+
+    0%,
+    45%,
+    65%,
+    85%,
+    to {
+      transform: rotate(0deg)
+    }
+
+    55%,
+    75% {
+      transform: rotate(10deg)
+    }
+  }
+
+  @keyframes ekuwomanarmbackrotate {
+
+    0%,
+    45%,
+    65%,
+    85%,
+    to {
+      transform: rotate(0deg)
+    }
+
+    55%,
+    75% {
+      transform: rotate(-13deg)
+    }
+  }
+
+  @keyframes manscreenpopup {
+
+    0%,
+    45%,
+    55%,
+    65%,
+    75%,
+    85% {
+      transform: scale(0)
+    }
+
+    to {
+      transform: scale(1)
+    }
+  }
+
+  @keyframes manscreenfloat {
+
+    0%,
+    to {
+      transform: translateY(0)
+    }
+
+    50% {
+      transform: translateY(-10px)
+    }
+  }
+
+  @keyframes backhairwave {
+
+    0%,
+    to {
+      transform: scaleX(1) skewX(0) skewY(0)
+    }
+
+    50% {
+      transform: scaleX(1.07) skewX(3deg) skewY(5deg)
+    }
+  }
+
+  #ku.svgmate #Bluearmbot,
+  #ku.svgmate #Chair,
+  #ku.svgmate #chairbackbar,
+  #ku.svgmate #man,
+  #ku.svgmate .mankauf {
+    animation-name: ekumanslidein;
+    animation-iteration-count: 1;
+    animation-duration: 1.2s;
+    animation-timing-function: ease-out;
+    transform-origin: 502px 454px
+  }
+
+  #ku.svgmate #Bluearmbot,
+  #ku.svgmate #Chair,
+  #ku.svgmate #chairbackbar,
+  #ku.svgmate .mankauf {
+    animation-duration: 1.5s
+  }
+
+  #ku.svgmate #Bluearmbot {
+    animation-name: ekumanarmrotate;
+    animation-iteration-count: infinite;
+    animation-duration: 1.8s;
+    animation-delay: 1.2s;
+    transform-origin: 448.122px 403.482px
+  }
+
+  #ku.svgmate .mankauf {
+    animation-name: ekumanhairwobble;
+    animation-duration: 1.38s;
+    transform-origin: 396.257px 260.5px
+  }
+
+  #ku.svgmate #Chair_1_,
+  #ku.svgmate #Woman,
+  #ku.svgmate #back-arm,
+  #ku.svgmate #backleg_1_ {
+    animation-name: ekuwomanlidein;
+    animation-iteration-count: 1;
+    animation-duration: 1.8s;
+    animation-timing-function: ease-out;
+    transform-origin: 502px 454px
+  }
+
+  #ku.svgmate #Chair_1_ {
+    animation-duration: 1.95s
+  }
+
+  #ku.svgmate #Laptop,
+  #ku.svgmate #keyboard {
+    animation-name: kulapdropin;
+    animation-iteration-count: 1;
+    animation-duration: 2s;
+    animation-timing-function: ease-in-out;
+    transform-origin: 648.689px 361.659px
+  }
+
+  #ku.svgmate #keyboard {
+    animation-duration: 2.5s;
+    transform-origin: 479.857px 383px
+  }
+
+  #ku.svgmate #lowerarm,
+  #ku.svgmate #lowervackarm {
+    animation-name: ekuwomanarmrotate;
+    animation-iteration-count: infinite;
+    animation-duration: 1.8s;
+    animation-delay: 2.1s;
+    animation-timing-function: ease-out;
+    transform-origin: 751.134px 385.578px
+  }
+
+  #ku.svgmate #lowervackarm {
+    animation-name: ekuwomanarmbackrotate;
+    transform-origin: 736.882px 386px
+  }
+
+  #ku.svgmate #Man_screen .greenscreen,
+  #ku.svgmate #Man_screen .redscreen,
+  #ku.svgmate #Man_screen .screenbutton {
+    animation-name: manscreenpopup;
+    animation-iteration-count: 1;
+    animation-duration: 3.6s;
+    animation-timing-function: ease-in-out;
+    transform-origin: 526.882px 383px
+  }
+
+  #ku.svgmate #Man_screen .greenscreen,
+  #ku.svgmate #Man_screen .redscreen {
+    animation-duration: 3s
+  }
+
+  #ku.svgmate #Man_screen .greenscreen {
+    animation-duration: 3.3s
+  }
+
+  #ku.svgmate #Man_screen,
+  #ku.svgmate #Man_screen .greenscrmove,
+  #ku.svgmate #Man_screen .redskmove,
+  #ku.svgmate .womscreenmove {
+    animation-name: manscreenfloat;
+    animation-iteration-count: infinite;
+    animation-duration: 9s;
+    animation-timing-function: ease-in-out
+  }
+
+  #ku.svgmate #Man_screen .greenscrmove,
+  #ku.svgmate #Man_screen .redskmove {
+    animation-duration: 6s
+  }
+
+  #ku.svgmate #Man_screen .greenscrmove {
+    animation-duration: 7.2s
+  }
+
+  #ku.svgmate #hairback,
+  #ku.svgmate #womanscreen {
+    animation-name: manscreenpopup;
+    animation-iteration-count: 1;
+    animation-duration: 3.9s;
+    animation-timing-function: ease-in-out;
+    transform-origin: 648.689px 361.659px
+  }
+
+  #ku.svgmate #hairback {
+    animation-name: backhairwave;
+    animation-iteration-count: infinite;
+    animation-duration: 3.3s;
+    transform-origin: 785.132px 295.833px
+  }
