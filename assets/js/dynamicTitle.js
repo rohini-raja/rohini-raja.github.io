@@ -3,7 +3,7 @@
 window.onload = function () {
   const favicon = document.getElementById("favicon");
   let pageTitle = document.title;
-  let attentionMessage = "Rohini.R";
+  let attentionMessage = "Ro's Portfolio";
   let blinkEvent = null;
 
   document.addEventListener("visibilitychange", function (e) {
