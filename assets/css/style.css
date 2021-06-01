@@ -1,6 +1,6 @@
 @font-face {
-  font-family: "Agustina";
-  src: url(../fonts/Agustina.woff);
+  font-family: "Ubuntu";
+  src: url(../fonts/Ubuntu.woff);
 }
 /*CSS variable declaration for light/dark mode*/
 html[data-theme="light"] {
@@ -88,6 +88,39 @@ html[data-theme="dark"] {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #666; 
+}
+
+.cross_line{
+  display: inline-block;
+  position: relative;
+  padding: 0.25em 1em;
+  border-top: solid 2px black;
+  border-bottom: solid 2px black;
+  text-decoration: none;
+  font-weight: bold;
+  color: #03A9F4;
+}
+.cross_line:before, .cross_line:after{
+content: '';
+position: absolute;
+top: -7px;
+width: 2px;
+height: -webkit-calc(100% + 14px);
+height: calc(100% + 14px);
+background-color: black;
+transition: .3s;
+}
+.cross_line:before {left: 7px;}
+.cross_line:after {right: 7px;}
+.cross_line:hover:before{
+top: 0px;
+left:0;
+height: 100%;
+}
+.cross_line:hover:after{
+top: 0px;
+right: 0;
+height: 100%;
 }
 
 body {

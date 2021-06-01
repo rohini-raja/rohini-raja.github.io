@@ -43,7 +43,7 @@ html[data-theme="dark"] {
 }
 /* Particle effect*/
 body{
-  font-family: "Poppins";
+  font-family: "Ubuntu";
 }
 #home,
 #particles-js {
@@ -152,11 +152,19 @@ body{
   z-index: 1;
   transition: var(--trans-props);
 }
-
+.website i {
+  margin: auto;
+  font-size: 24px;
+  z-index: 1;
+  transition: var(--trans-props);
+}
 
 
 .socialicon.goodreads{
   color:var(--col-icon-goodreads);
+}
+.socialicon.website{
+  color:var(--col-icon-website);
 }
 
 .socialicon.medium{
@@ -336,6 +344,39 @@ body{
      DRIBBBLE MICROANIMATION
   --------------------------
   */
+  .cross_line{
+    display: inline-block;
+    position: relative;
+    font: Ubuntu;
+    padding: 0.25em 1em;
+    border-top: solid 2px black;
+    border-bottom: solid 2px black;
+    text-decoration: none;
+    font-weight: bold;
+    color: #000000;
+}
+.cross_line:before, .cross_line:after{
+  content: '';
+  position: absolute;
+  top: -7px;
+  width: 2px;
+  height: -webkit-calc(100% + 14px);
+  height: calc(100% + 14px);
+  background-color: black;
+  transition: .3s;
+}
+.cross_line:before {left: 7px;}
+.cross_line:after {right: 7px;}
+.cross_line:hover:before{
+  top: 0px;
+  left:0;
+  height: 100%;
+}
+.cross_line:hover:after{
+  top: 0px;
+  right: 0;
+  height: 100%;
+}
   
   .dribbble-icon{
     width: 30px;
