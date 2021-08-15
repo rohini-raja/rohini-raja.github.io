@@ -191,6 +191,11 @@ body{
   box-shadow: var(--medium);
 }
 
+.socialicon.goodreads:after {
+  background-color: #41aff3;
+  box-shadow: var(--col-icon-website);
+}
+
  /*
 ---------------------------
    LINKEDIN MICROANIMATION
