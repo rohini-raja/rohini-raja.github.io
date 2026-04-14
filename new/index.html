@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rohini R — Software Engineer</title>
+  <meta name="description" content="Rohini Rajasimman — Software Engineer. Building things with code.">
+  <meta name="keywords" content="Rohini Rajasimman, Software Engineer, Portfolio, React, Java, Python">
+  <meta property="og:title" content="Rohini R — Software Engineer">
+  <meta property="og:description" content="Software Engineer building things with code.">
+  <meta property="og:url" content="https://rohini-raja.github.io">
+  <meta name="robots" content="index,follow">
+  <link rel="icon" href="assets/images/Rohini.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:         #0a0d14;
+      --bg-2:       #0f1320;
+      --bg-3:       #161b2e;
+      --border:     rgba(255,255,255,0.07);
+      --accent:     #64ffda;
+      --accent-dim: rgba(100,255,218,0.08);
+      --purple:     #a78bfa;
+      --text:       #ccd6f6;
+      --muted:      #8892b0;
+      --white:      #e6f1ff;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, sans-serif;
+      font-size: 16px;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* dot-grid */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image: radial-gradient(rgba(100,255,218,0.04) 1px, transparent 1px);
+      background-size: 28px 28px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--bg-3); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(100,255,218,0.2); }
+
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 32px; }
+    section { position: relative; z-index: 1; padding: 100px 0; }
+
+    .section-label {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.78rem;
+      color: var(--accent);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .section-title {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 52px;
+      position: relative;
+      display: inline-block;
+    }
+    .section-title::after {
+      content: "";
+      position: absolute;
+      left: 0; bottom: -10px;
+      width: 36px; height: 2px;
+      background: var(--accent);
+      border-radius: 2px;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 20px 0;
+      transition: background 0.3s, box-shadow 0.3s;
+    }
+    nav.scrolled {
+      background: rgba(10,13,20,0.88);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: 0 1px 0 var(--border);
+    }
+    .nav-inner {
+      max-width: 1100px; margin: 0 auto; padding: 0 32px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-logo {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 1.05rem; font-weight: 500;
+      color: var(--accent); text-decoration: none;
+    }
+    .nav-logo span { color: var(--muted); }
+    .nav-links { display: flex; gap: 32px; list-style: none; }
+    .nav-links a {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.8rem; color: var(--muted);
+      text-decoration: none; transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--accent); }
+    .nav-links a span { color: var(--accent); margin-right: 4px; }
+
+    /* HERO */
+    #hero {
+      min-height: 100vh;
+      display: flex; align-items: center;
+      padding: 120px 0 80px;
+    }
+    .hero-inner {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 64px;
+    }
+    .hero-eyebrow {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.88rem; color: var(--accent);
+      margin-bottom: 16px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .hero-eyebrow::before { content: ""; width: 32px; height: 1px; background: var(--accent); }
+    .hero-name {
+      font-size: clamp(2.8rem, 6vw, 5rem);
+      font-weight: 700; color: var(--white);
+      line-height: 1.1; letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+    .hero-role {
+      font-size: clamp(1.3rem, 2.5vw, 2rem);
+      font-weight: 500; color: var(--muted);
+      margin-bottom: 28px; min-height: 2.4rem;
+    }
+    #typewriter {
+      color: var(--purple);
+      border-right: 2px solid var(--purple);
+      animation: blink 0.8s step-end infinite;
+    }
+    @keyframes blink { 50% { border-color: transparent; } }
+    .hero-desc {
+      font-size: 1.02rem; color: var(--muted);
+      max-width: 480px; margin-bottom: 40px; line-height: 1.85;
+    }
+    .hero-cta { display: flex; gap: 14px; flex-wrap: wrap; }
+
+    .btn-primary {
+      padding: 12px 28px;
+      background: transparent;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.82rem; text-decoration: none;
+      border-radius: 4px;
+      transition: background 0.2s, transform 0.2s;
+      letter-spacing: 0.05em; display: inline-block;
+    }
+    .btn-primary:hover { background: var(--accent-dim); transform: translateY(-2px); }
+
+    .btn-secondary {
+      padding: 12px 28px;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.82rem; text-decoration: none;
+      border-radius: 4px;
+      transition: border-color 0.2s, color 0.2s, transform 0.2s;
+      letter-spacing: 0.05em;
+    }
+    .btn-secondary:hover { border-color: var(--muted); color: var(--text); transform: translateY(-2px); }
+
+    /* terminal card */
+    .terminal {
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden;
+      width: 370px; flex-shrink: 0;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.45);
+    }
+    .terminal-bar {
+      background: var(--bg-3);
+      padding: 12px 16px;
+      display: flex; align-items: center; gap: 7px;
+      border-bottom: 1px solid var(--border);
+    }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot.r { background: #ff5f57; }
+    .dot.y { background: #febc2e; }
+    .dot.g { background: #28c840; }
+    .terminal-title {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.72rem; color: var(--muted);
+      margin: 0 auto;
+    }
+    .terminal-body {
+      padding: 20px 24px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.78rem; line-height: 1.95;
+    }
+    .tc { color: #3d4f6b; }
+    .tk { color: var(--purple); }
+    .ts { color: var(--accent); }
+    .tp { color: var(--muted); }
+    .ta { color: #ff9d52; }
+    .tn { color: #f97583; }
+    .tw { color: var(--white); }
+    .tf { color: #82aaff; }
+
+    /* ABOUT */
+    #about .about-grid {
+      display: grid;
+      grid-template-columns: 3fr 2fr;
+      gap: 64px; align-items: start;
+    }
+    .about-text p { color: var(--muted); margin-bottom: 18px; font-size: 1.02rem; line-height: 1.9; }
+    .about-text strong { color: var(--text); font-weight: 500; }
+    .about-text a { color: var(--accent); text-decoration: none; }
+    .about-text a:hover { text-decoration: underline; }
+    .about-stats { display: flex; flex-direction: column; gap: 16px; }
+    .stat-card {
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: 10px; padding: 20px 24px;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .stat-card:hover { border-color: rgba(100,255,218,0.25); transform: translateX(4px); }
+    .stat-num {
+      font-size: 1.9rem; font-weight: 700;
+      color: var(--accent);
+      font-family: "JetBrains Mono", monospace;
+      line-height: 1; margin-bottom: 4px;
+    }
+    .stat-label { font-size: 0.78rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.09em; }
+
+    /* PROJECTS */
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+      gap: 18px;
+    }
+    .project-card {
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: 12px; padding: 28px;
+      display: flex; flex-direction: column;
+      transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+      text-decoration: none;
+    }
+    .project-card:hover {
+      border-color: rgba(100,255,218,0.28);
+      transform: translateY(-5px);
+      box-shadow: 0 16px 48px rgba(0,0,0,0.4);
+    }
+    .project-card-header {
+      display: flex; align-items: flex-start;
+      justify-content: space-between; margin-bottom: 16px;
+    }
+    .project-icon { font-size: 1.8rem; }
+    .ext-icon { color: var(--muted); transition: color 0.2s; flex-shrink: 0; }
+    .project-card:hover .ext-icon { color: var(--accent); }
+    .project-name { font-size: 1rem; font-weight: 600; color: var(--white); margin-bottom: 10px; }
+    .project-desc { font-size: 0.88rem; color: var(--muted); line-height: 1.75; flex: 1; margin-bottom: 22px; }
+    .project-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+    .tag {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.7rem; color: var(--accent);
+      background: var(--accent-dim);
+      padding: 3px 10px; border-radius: 4px;
+      letter-spacing: 0.04em;
+    }
+
+    /* SKILLS */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+      gap: 10px;
+    }
+    .skill-chip {
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: 8px; padding: 13px 18px;
+      display: flex; align-items: center; gap: 10px;
+      font-size: 0.88rem; color: var(--text); font-weight: 500;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .skill-chip:hover { border-color: rgba(100,255,218,0.22); background: var(--bg-3); }
+    .skill-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+
+    /* CONTACT */
+    #contact { text-align: center; }
+    #contact .section-title::after { left: 50%; transform: translateX(-50%); }
+    .contact-desc { color: var(--muted); max-width: 460px; margin: 0 auto 40px; line-height: 1.85; }
+    .social-row { display: flex; justify-content: center; gap: 16px; margin-top: 44px; flex-wrap: wrap; }
+    .social-link {
+      width: 44px; height: 44px;
+      border: 1px solid var(--border); border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--muted); text-decoration: none;
+      transition: border-color 0.2s, color 0.2s, transform 0.2s;
+    }
+    .social-link:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-3px); }
+    .social-link svg { width: 17px; height: 17px; }
+
+    /* FOOTER */
+    footer {
+      position: relative; z-index: 1;
+      text-align: center; padding: 28px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.76rem;
+    }
+    footer a { color: var(--accent); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    /* SCROLL REVEAL */
+    .reveal { opacity: 0; transform: translateY(22px); transition: opacity 0.65s ease, transform 0.65s ease; }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      .hero-inner { grid-template-columns: 1fr; }
+      .terminal { display: none; }
+      #about .about-grid { grid-template-columns: 1fr; gap: 40px; }
+      .about-stats { flex-direction: row; flex-wrap: wrap; }
+      .stat-card { flex: 1; min-width: 130px; }
+    }
+    @media (max-width: 600px) {
+      section { padding: 72px 0; }
+      .container { padding: 0 20px; }
+      .nav-links { display: none; }
+      .hero-name { font-size: 2.6rem; }
+      .projects-grid { grid-template-columns: 1fr; }
+      .skills-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="navbar">
+  <div class="nav-inner">
+    <a class="nav-logo" href="#hero">rohini<span>_r</span></a>
+    <ul class="nav-links">
+      <li><a href="#about"><span>01.</span>About</a></li>
+      <li><a href="#projects"><span>02.</span>Projects</a></li>
+      <li><a href="#skills"><span>03.</span>Skills</a></li>
+      <li><a href="#contact"><span>04.</span>Contact</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="container">
+    <div class="hero-inner">
+      <div>
+        <p class="hero-eyebrow">hi, I'm</p>
+        <h1 class="hero-name">Rohini R</h1>
+        <h2 class="hero-role"><span id="typewriter"></span></h2>
+        <p class="hero-desc">
+          Software engineer with a knack for building clean, performant software —
+          from ML pipelines to full-stack web apps and everything in between.
+        </p>
+        <div class="hero-cta">
+          <a href="#projects" class="btn-primary">View Projects</a>
+          <a href="https://www.linkedin.com/in/rohini-raja" target="_blank" rel="noopener" class="btn-secondary">Get in Touch</a>
+        </div>
+      </div>
+
+      <div class="terminal">
+        <div class="terminal-bar">
+          <span class="dot r"></span>
+          <span class="dot y"></span>
+          <span class="dot g"></span>
+          <span class="terminal-title">rohini.js</span>
+        </div>
+        <div class="terminal-body">
+          <div class="tc">// about me</div>
+          <div><span class="tk">const</span> <span class="tw">developer</span> <span class="tp">= {</span></div>
+          <div>&nbsp;&nbsp;<span class="tk">name</span><span class="tp">:</span> <span class="ts">"Rohini R"</span><span class="tp">,</span></div>
+          <div>&nbsp;&nbsp;<span class="tk">role</span><span class="tp">:</span> <span class="ts">"Software Engineer"</span><span class="tp">,</span></div>
+          <div>&nbsp;&nbsp;<span class="tk">location</span><span class="tp">:</span> <span class="ts">"India &#x1F1EE;&#x1F1F3;"</span><span class="tp">,</span></div>
+          <div>&nbsp;&nbsp;<span class="tk">languages</span><span class="tp">: [</span></div>
+          <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="ta">"Java"</span><span class="tp">,</span> <span class="ta">"Python"</span><span class="tp">,</span></div>
+          <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="ta">"TypeScript"</span><span class="tp">,</span></div>
+          <div>&nbsp;&nbsp;<span class="tp">],</span></div>
+          <div>&nbsp;&nbsp;<span class="tk">coffeeChats</span><span class="tp">:</span> <span class="tn">true</span><span class="tp">,</span></div>
+          <div><span class="tp">};</span></div>
+          <br>
+          <div class="tc">// currently building</div>
+          <div><span class="tk">console</span><span class="tp">.</span><span class="tf">log</span><span class="tp">(</span><span class="ts">"FocusFlight &#x1F6EB;"</span><span class="tp">);</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="container">
+    <p class="section-label reveal">// 01</p>
+    <h2 class="section-title reveal">About</h2>
+    <div class="about-grid reveal">
+      <div class="about-text">
+        <p>
+          I'm a software engineer who enjoys building things that live on the internet — whether
+          that's full-stack web apps, ML models, or low-level systems. I like problems that sit
+          at the intersection of <strong>engineering and product</strong>.
+        </p>
+        <p>
+          Currently building <a href="https://focus-flight-ten.vercel.app" target="_blank" rel="noopener">Focus Flight</a>,
+          a productivity app that turns focus sessions into immersive virtual journeys — complete with
+          real-world maps, ambient sound, focus score tracking, and a pilot's logbook.
+        </p>
+        <p>
+          When I'm not writing code, I'm reading — fiction, psychology, or whatever's next on my
+          <a href="https://www.goodreads.com/user/show/114262761-rohini-r" target="_blank" rel="noopener">Goodreads</a> shelf.
+        </p>
+      </div>
+      <div class="about-stats">
+        <div class="stat-card">
+          <div class="stat-num">3+</div>
+          <div class="stat-label">Years coding</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">10+</div>
+          <div class="stat-label">Projects shipped</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">&#x221E;</div>
+          <div class="stat-label">Problems solved</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="container">
+    <p class="section-label reveal">// 02</p>
+    <h2 class="section-title reveal">Projects</h2>
+    <div class="projects-grid">
+
+      <a class="project-card reveal" href="https://github.com/rohini-raja/Focus-Flight" target="_blank" rel="noopener">
+        <div class="project-card-header">
+          <span class="project-icon">&#x1F6EB;</span>
+          <svg class="ext-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </div>
+        <p class="project-name">Focus Flight</p>
+        <p class="project-desc">Productivity app that turns focus sessions into immersive flight journeys. Real-time maps, focus score tracking via Page Visibility API, achievements, and ambient sounds.</p>
+        <div class="project-tags">
+          <span class="tag">React</span><span class="tag">TypeScript</span><span class="tag">Vite</span><span class="tag">Leaflet</span>
+        </div>
+      </a>
+
+      <a class="project-card reveal" href="https://github.com/rohini-raja/breast_cancer_classification_using_machine_learning" target="_blank" rel="noopener">
+        <div class="project-card-header">
+          <span class="project-icon">&#x1F52C;</span>
+          <svg class="ext-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </div>
+        <p class="project-name">Cancer Classification ML</p>
+        <p class="project-desc">ML model classifying breast cancer stages as benign or malignant using histopathological images. Implements image analysis with scikit-learn pipelines.</p>
+        <div class="project-tags">
+          <span class="tag">Python</span><span class="tag">scikit-learn</span><span class="tag">CNN</span><span class="tag">NumPy</span>
+        </div>
+      </a>
+
+      <a class="project-card reveal" href="https://github.com/rohini-raja/Secure-text-transfer-using-AWS" target="_blank" rel="noopener">
+        <div class="project-card-header">
+          <span class="project-icon">&#x1F510;</span>
+          <svg class="ext-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </div>
+        <p class="project-name">Secure File Transfer (AWS)</p>
+        <p class="project-desc">AES encryption + Diffie-Hellman key exchange for secure text transfer hosted on AWS. End-to-end encrypted communication between nodes.</p>
+        <div class="project-tags">
+          <span class="tag">Python</span><span class="tag">AWS</span><span class="tag">AES</span><span class="tag">Cryptography</span>
+        </div>
+      </a>
+
+      <a class="project-card reveal" href="https://github.com/rohini-raja/blockchain" target="_blank" rel="noopener">
+        <div class="project-card-header">
+          <span class="project-icon">&#x26D3;&#xFE0F;</span>
+          <svg class="ext-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </div>
+        <p class="project-name">Blockchain from Scratch</p>
+        <p class="project-desc">Core blockchain concepts built from scratch in Python — SHA-256 hashing, proof-of-work consensus, chain validation, and peer node simulation.</p>
+        <div class="project-tags">
+          <span class="tag">Python</span><span class="tag">Cryptography</span><span class="tag">P2P</span>
+        </div>
+      </a>
+
+      <a class="project-card reveal" href="https://github.com/rohini-raja/compiler_project" target="_blank" rel="noopener">
+        <div class="project-card-header">
+          <span class="project-icon">&#x2699;&#xFE0F;</span>
+          <svg class="ext-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </div>
+        <p class="project-name">Lexical Scanner &amp; Parser</p>
+        <p class="project-desc">Compiler front-end built from scratch — a lexical scanner that tokenises source code and a recursive-descent parser for syntax analysis.</p>
+        <div class="project-tags">
+          <span class="tag">Java</span><span class="tag">Compilers</span><span class="tag">Parsing</span>
+        </div>
+      </a>
+
+      <a class="project-card reveal" href="https://github.com/rohini-raja/Java-Data-Structures-and-Algorithms" target="_blank" rel="noopener">
+        <div class="project-card-header">
+          <span class="project-icon">&#x1F9E9;</span>
+          <svg class="ext-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </div>
+        <p class="project-name">DSA in Java</p>
+        <p class="project-desc">Curated solutions to LeetCode problems with annotated explanations. Covers trees, graphs, dynamic programming, sorting, and more.</p>
+        <div class="project-tags">
+          <span class="tag">Java</span><span class="tag">Algorithms</span><span class="tag">LeetCode</span>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="container">
+    <p class="section-label reveal">// 03</p>
+    <h2 class="section-title reveal">Skills</h2>
+    <div class="skills-grid reveal">
+      <div class="skill-chip"><span class="skill-dot"></span>Java</div>
+      <div class="skill-chip"><span class="skill-dot"></span>Python</div>
+      <div class="skill-chip"><span class="skill-dot"></span>TypeScript</div>
+      <div class="skill-chip"><span class="skill-dot"></span>JavaScript</div>
+      <div class="skill-chip"><span class="skill-dot"></span>React</div>
+      <div class="skill-chip"><span class="skill-dot"></span>HTML / CSS</div>
+      <div class="skill-chip"><span class="skill-dot"></span>Machine Learning</div>
+      <div class="skill-chip"><span class="skill-dot"></span>scikit-learn</div>
+      <div class="skill-chip"><span class="skill-dot"></span>Data Structures</div>
+      <div class="skill-chip"><span class="skill-dot"></span>Algorithms</div>
+      <div class="skill-chip"><span class="skill-dot"></span>AWS</div>
+      <div class="skill-chip"><span class="skill-dot"></span>Git</div>
+      <div class="skill-chip"><span class="skill-dot"></span>REST APIs</div>
+      <div class="skill-chip"><span class="skill-dot"></span>SQL</div>
+      <div class="skill-chip"><span class="skill-dot"></span>Linux</div>
+      <div class="skill-chip"><span class="skill-dot"></span>Vite</div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="container">
+    <p class="section-label reveal">// 04</p>
+    <h2 class="section-title reveal">Get in Touch</h2>
+    <p class="contact-desc reveal">
+      I'm always open to interesting conversations, collaborations, or new opportunities.
+      Feel free to reach out — I'll do my best to get back to you.
+    </p>
+    <a href="https://www.linkedin.com/in/rohini-raja" target="_blank" rel="noopener" class="btn-primary reveal">Say Hello &#x2192;</a>
+    <div class="social-row reveal">
+      <a class="social-link" href="https://www.github.com/rohini-raja" target="_blank" rel="noopener" title="GitHub">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+      </a>
+      <a class="social-link" href="https://www.linkedin.com/in/rohini-raja" target="_blank" rel="noopener" title="LinkedIn">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+      </a>
+      <a class="social-link" href="https://www.instagram.com/rohini_raja" target="_blank" rel="noopener" title="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+      </a>
+      <a class="social-link" href="https://www.goodreads.com/user/show/114262761-rohini-r" target="_blank" rel="noopener" title="Goodreads">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>Designed &amp; built by <a href="https://github.com/rohini-raja">Rohini R</a> &nbsp;&middot;&nbsp; <a href="https://github.com/rohini-raja/rohini-raja.github.io">View Source</a></p>
+</footer>
+
+<script>
+  // Nav glass on scroll
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', function() {
+    navbar.classList.toggle('scrolled', window.scrollY > 50);
+  }, { passive: true });
+
+  // Typewriter
+  var roles = ['Software Engineer', 'Full-Stack Developer', 'ML Enthusiast', 'Problem Solver'];
+  var ri = 0, ci = 0, del = false;
+  var tw = document.getElementById('typewriter');
+  function type() {
+    var word = roles[ri];
+    tw.textContent = del ? word.slice(0, --ci) : word.slice(0, ++ci);
+    if (!del && ci === word.length) { del = true; setTimeout(type, 1800); return; }
+    if (del && ci === 0) { del = false; ri = (ri + 1) % roles.length; }
+    setTimeout(type, del ? 48 : 78);
+  }
+  type();
+
+  // Scroll reveal
+  var obs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+  document.querySelectorAll('.reveal').forEach(function(el) { obs.observe(el); });
+</script>
+</body>
+</html>
