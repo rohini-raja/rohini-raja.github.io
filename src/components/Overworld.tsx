@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, useCallback, Fragment } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTheme } from "../lib/ThemeContext";
 import Character from "./Character"; // spaceship
+import StarField from "./StarField";
 import Library from "./buildings/Library";
 import Lab from "./buildings/Lab";
 import Academy from "./buildings/Academy";
@@ -197,8 +198,6 @@ export default function Overworld() {
   const [nearBy, setNearBy]       = useState<BuildingId | null>(null);
 
   // NASA data
-  const [nasaBg, setNasaBg]         = useState<string | null>(null);
-  const [nasaBgTitle, setNasaBgTitle] = useState<string>("");
   const [epicUrl, setEpicUrl]       = useState<string | null>(null);
   const [epicDate, setEpicDate]     = useState<string | null>(null);
   const [planetImgs, setPlanetImgs] = useState<Partial<Record<BuildingId,string>>>({});
@@ -219,27 +218,7 @@ export default function Overworld() {
 
   // ── Fetch all NASA data on mount ──────────────────────────────────────────
   useEffect(() => {
-    // 1. NASA Image Library – real Hubble/JWST galaxy image for background
-    fetch("https://images-api.nasa.gov/search?q=hubble+spiral+galaxy+deep+field&media_type=image&page_size=10")
-      .then(r => r.json())
-      .then((data: { collection:{ items:Array<{ links?:Array<{ href:string }>; data?:Array<{ title:string }> }> } }) => {
-        const items = data.collection?.items;
-        if (!items?.length) return;
-        // Pick a random one for variety each visit
-        const pick = items[Math.floor(Math.random() * Math.min(items.length, 8))];
-        const thumb = pick?.links?.[0]?.href;
-        const title = pick?.data?.[0]?.title ?? "NASA Galaxy";
-        if (!thumb) return;
-        // Upgrade to original/large image
-        const large = thumb
-          .replace("~thumb.jpg", "~orig.jpg")
-          .replace("~thumb.png", "~orig.png");
-        setNasaBg(large);
-        setNasaBgTitle(title);
-      })
-      .catch(() => {});
-
-    // 2. EPIC – real-time Earth
+    // 1. EPIC – real-time Earth
     fetch("https://epic.gsfc.nasa.gov/api/natural")
       .then(r => r.json())
       .then((data: Array<{ image:string; date:string }>) => {
@@ -360,17 +339,8 @@ export default function Overworld() {
       style={{ background:"transparent", cursor:"default", touchAction:"none" }}
       tabIndex={0}
     >
-      {/* ── NASA galaxy background — full brightness, no CSS overlay ── */}
-      {nasaBg
-        ? <img src={nasaBg} alt="NASA galaxy" style={{
-            position:"fixed", inset:0,
-            width:"100%", height:"100%",
-            objectFit:"cover", objectPosition:"center",
-            zIndex:0, pointerEvents:"none",
-            display:"block",
-          }} />
-        : <div style={{ position:"fixed", inset:0, background:"#000", zIndex:0 }} />
-      }
+      {/* ── Animated starfield background ── */}
+      <StarField />
 
 
       {/* ── Map ── */}
@@ -518,14 +488,13 @@ export default function Overworld() {
       )}
 
       {/* NASA attribution */}
-      {(nasaBg || epicDate) && (
+      {epicDate && (
         <div style={{
           position:"fixed",bottom:8,left:8,
           fontFamily:"monospace",fontSize:8,opacity:0.4,
           color:"#aef",zIndex:50,pointerEvents:"none",lineHeight:1.7,
         }}>
-          {nasaBg && <div>APOD: {nasaBgTitle}</div>}
-          {epicDate && <div>Earth: NASA EPIC {epicDate}</div>}
+          <div>Earth: NASA EPIC {epicDate}</div>
         </div>
       )}
 
