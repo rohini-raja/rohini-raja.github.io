@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, Fragment } from "react";
 import { AnimatePresence } from "framer-motion";
 import { useTheme } from "../lib/ThemeContext";
 import Character from "./Character";
@@ -298,7 +298,7 @@ export default function Overworld() {
         {BUILDINGS.map((b) => {
           const isNear = nearBy === b.id;
           return (
-            <g key={b.id}>
+            <Fragment key={b.id}>
               {/* Glow when near */}
               {isNear && (
                 <div
@@ -383,7 +383,7 @@ export default function Overworld() {
               >
                 {b.emoji} {b.label}
               </div>
-            </g>
+            </Fragment>
           );
         })}
 
