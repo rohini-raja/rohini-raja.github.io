@@ -328,12 +328,23 @@ export default function Overworld() {
 
   // ── Fetch all NASA data on mount ──────────────────────────────────────────
   useEffect(() => {
-    // 1. APOD – galaxy background
-    fetch("https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY&thumbs=true")
+    // 1. NASA Image Library – real Hubble/JWST galaxy image for background
+    fetch("https://images-api.nasa.gov/search?q=hubble+spiral+galaxy+deep+field&media_type=image&page_size=10")
       .then(r => r.json())
-      .then((d: { url:string; hdurl?:string; title:string; media_type:string; thumbnail_url?:string }) => {
-        const url = d.media_type === "image" ? (d.hdurl || d.url) : (d.thumbnail_url || null);
-        if (url) { setNasaBg(url); setNasaBgTitle(d.title); }
+      .then((data: { collection:{ items:Array<{ links?:Array<{ href:string }>; data?:Array<{ title:string }> }> } }) => {
+        const items = data.collection?.items;
+        if (!items?.length) return;
+        // Pick a random one for variety each visit
+        const pick = items[Math.floor(Math.random() * Math.min(items.length, 8))];
+        const thumb = pick?.links?.[0]?.href;
+        const title = pick?.data?.[0]?.title ?? "NASA Galaxy";
+        if (!thumb) return;
+        // Upgrade to original/large image
+        const large = thumb
+          .replace("~thumb.jpg", "~orig.jpg")
+          .replace("~thumb.png", "~orig.png");
+        setNasaBg(large);
+        setNasaBgTitle(title);
       })
       .catch(() => {});
 
