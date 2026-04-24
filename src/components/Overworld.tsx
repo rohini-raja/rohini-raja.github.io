@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback, Fragment } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTheme } from "../lib/ThemeContext";
-import Character from "./Character";
+import Character from "./Character"; // spaceship
 import Library from "./buildings/Library";
 import Lab from "./buildings/Lab";
 import Academy from "./buildings/Academy";
