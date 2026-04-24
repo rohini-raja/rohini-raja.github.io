@@ -400,17 +400,6 @@ export default function Overworld() {
         {/* Ground — transparent so NASA galaxy shows through */}
         <div style={{ position:"absolute", inset:0, background:"transparent" }} />
 
-        {/* Black holes (water) */}
-        {WATER_TILES.map((w, i) => (
-          <div key={i} style={{
-            position:"absolute", left:w.x*TILE, top:w.y*TILE,
-            width:w.w*TILE, height:w.h*TILE,
-            background:"radial-gradient(circle,#000 30%,#1a003a 70%,#000)",
-            boxShadow:`inset 0 0 ${w.w*TILE*0.6}px rgba(80,0,160,0.7),0 0 20px rgba(60,0,120,0.4)`,
-            borderRadius:"50%",
-          }} />
-        ))}
-
         {/* Asteroids (trees) */}
         {[
           [9,5],[10,6],[9,10],[15,6],[16,10],[22,6],[23,7],
