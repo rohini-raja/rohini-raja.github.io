@@ -402,6 +402,9 @@ export default function Overworld() {
   const [activeBuilding, setActiveBuilding] = useState<BuildingId | null>(null);
   const [nearBy, setNearBy] = useState<BuildingId | null>(null);
   const [spaceMode, setSpaceMode] = useState(false);
+  const [epicUrl, setEpicUrl]   = useState<string | null>(null);
+  const [epicDate, setEpicDate] = useState<string | null>(null);
+  const [apodBg, setApodBg]     = useState<{ url: string; title: string } | null>(null);
   const keysRef   = useRef<Set<string>>(new Set());
   const animRef   = useRef<number>(0);
   const lastRef   = useRef<number>(0);
@@ -483,6 +486,36 @@ export default function Overworld() {
   }, []);
 
   useEffect(() => {
+    if (!spaceMode) return;
+    if (!epicUrl) {
+      fetch("https://epic.gsfc.nasa.gov/api/natural")
+        .then(r => r.json())
+        .then((data: Array<{ image: string; date: string }>) => {
+          if (!data?.length) return;
+          const latest = data[0];
+          const d = new Date(latest.date.replace(" ", "T") + "Z");
+          const yr = d.getUTCFullYear();
+          const mo = String(d.getUTCMonth() + 1).padStart(2, "0");
+          const dy = String(d.getUTCDate()).padStart(2, "0");
+          setEpicUrl(`https://epic.gsfc.nasa.gov/archive/natural/${yr}/${mo}/${dy}/png/${latest.image}.png`);
+          setEpicDate(latest.date.slice(0, 10));
+        })
+        .catch(() => {});
+    }
+    if (!apodBg) {
+      fetch("https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY&thumbs=true")
+        .then(r => r.json())
+        .then((data: { url: string; hdurl?: string; title: string; media_type: string; thumbnail_url?: string }) => {
+          const imgUrl = data.media_type === "image"
+            ? (data.hdurl || data.url)
+            : (data.thumbnail_url || null);
+          if (imgUrl) setApodBg({ url: imgUrl, title: data.title });
+        })
+        .catch(() => {});
+    }
+  }, [spaceMode, epicUrl, apodBg]);
+
+  useEffect(() => {
     (window as any).sudo = (cmd: string) => {
       if (cmd === "hire rohini") {
         console.log("%c✓ sudo hire rohini", "color:#6ee86e;font-size:16px;font-weight:bold");
@@ -514,6 +547,55 @@ export default function Overworld() {
           animationDelay: `${s.delay}s`,
         }} />
       ))}
+
+      {/* ── NASA APOD real galaxy / deep-space background ── */}
+      {spaceMode && apodBg && (
+        <div style={{
+          position: "fixed", inset: 0,
+          backgroundImage: `url(${apodBg.url})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          filter: "brightness(0.38) saturate(1.4)",
+          zIndex: 0,
+          pointerEvents: "none",
+        }} />
+      )}
+
+      {/* ── NASA EPIC real-time Earth sphere ── */}
+      {spaceMode && (
+        <div style={{
+          position: "fixed",
+          right: -60, bottom: -60,
+          width: 380, height: 380,
+          borderRadius: "50%",
+          overflow: "hidden",
+          zIndex: 2,
+          pointerEvents: "none",
+          boxShadow: "0 0 60px rgba(50,140,255,0.5), 0 0 160px rgba(30,80,200,0.25)",
+        }}>
+          {epicUrl
+            ? <img src={epicUrl} alt="Live Earth" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            : <div style={{ width: "100%", height: "100%", background: "radial-gradient(circle at 40% 35%, #1a6b9a 0%, #0a3d62 45%, #020d1a 100%)" }} />
+          }
+          {/* atmosphere rim */}
+          <div style={{
+            position: "absolute", inset: 0, borderRadius: "50%",
+            background: "radial-gradient(circle, transparent 60%, rgba(50,140,255,0.25) 78%, rgba(60,160,255,0.55) 93%, rgba(40,110,200,0.7) 100%)",
+          }} />
+        </div>
+      )}
+
+      {/* ── NASA attribution ── */}
+      {spaceMode && (apodBg || epicUrl) && (
+        <div style={{
+          position: "fixed", bottom: 8, left: 8,
+          fontFamily: "monospace", fontSize: 8, opacity: 0.4,
+          color: "#aef", zIndex: 50, pointerEvents: "none", lineHeight: 1.6,
+        }}>
+          {apodBg && <div>APOD: {apodBg.title}</div>}
+          {epicDate && <div>Earth: NASA EPIC {epicDate}</div>}
+        </div>
+      )}
 
       {/* ── Nebulae (space mode only) ── */}
       {spaceMode && NEBULAE.map((n, i) => (
