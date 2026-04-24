@@ -105,6 +105,29 @@ canvas, .pixel-art {
 ::-webkit-scrollbar-track { background: var(--theme-bg); }
 ::-webkit-scrollbar-thumb { background: var(--theme-accent); }
 
+/* Space mode */
+@keyframes atmospherePulse {
+  0%, 100% { opacity: 0.35; transform: scale(1); }
+  50%       { opacity: 0.7;  transform: scale(1.04); }
+}
+@keyframes moonOrbit {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes nebulaBreath {
+  0%, 100% { opacity: 0.09; transform: scale(1)    rotate(0deg); }
+  50%      { opacity: 0.18; transform: scale(1.06) rotate(3deg); }
+}
+@keyframes shootStar {
+  0%   { transform: translate(0,0)        scaleX(1);  opacity: 0; }
+  4%   { opacity: 1; }
+  100% { transform: translate(420px,210px) scaleX(50); opacity: 0; }
+}
+@keyframes cometPulse {
+  0%, 100% { opacity: 0.55; }
+  50%      { opacity: 0.85; }
+}
+
 /* Walk animation */
 @keyframes walkDown {
   0% { background-position-y: 0px; }
