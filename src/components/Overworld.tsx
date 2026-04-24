@@ -68,94 +68,25 @@ const FALLBACK_ICONS: Record<BuildingId, string> = {
   cinema:    "🎬",
 };
 
-// ─── Planet visual configs ───────────────────────────────────────────────────
-const PLANET: Record<BuildingId, {
-  r: number;
-  gradient: string;
-  atmoColor: string;
-  ring?:   { color: string; w: number; h: number; thickness: number };
-  moon?:   { r: number; color: string; orbit: number; speed: number };
-  tail?:   boolean;
-  floatDur: number;
-}> = {
-  library: {
-    r:88, gradient:"radial-gradient(circle at 38% 30%,#f3d0ff,#9d4edd 35%,#5a189a 65%,#10002b)",
-    atmoColor:"#c77dff",
-    ring:{ color:"#c77dff", w:3.6, h:0.55, thickness:3 },
-    moon:{ r:11, color:"#e0aaff", orbit:132, speed:11 },
-    floatDur:5,
-  },
-  lab: {
-    r:84, gradient:"radial-gradient(circle at 36% 27%,#d0f7ff,#48cae4 28%,#0096c7 58%,#023e8a 82%,#03045e)",
-    atmoColor:"#48cae4",
-    moon:{ r:14, color:"#caf0f8", orbit:128, speed:9 },
-    floatDur:6,
-  },
-  academy: {
-    r:108, gradient:"radial-gradient(circle at 36% 28%,#fff3b0,#f4a261 26%,#e76f51 52%,#9b2226 78%,#370617)",
-    atmoColor:"#f4a261",
-    ring:{ color:"#f4a261", w:3.8, h:0.52, thickness:4 },
-    floatDur:7,
-  },
-  shrine: {
-    r:80, gradient:"radial-gradient(circle at 40% 33%,#ff9e9e,#c1121f 40%,#6a040f 70%,#270000)",
-    atmoColor:"#e63946", tail:true,
-    floatDur:4,
-  },
-  arcade: {
-    r:86, gradient:"radial-gradient(circle at 33% 26%,#b2ffff,#00f5ff 25%,#0096c7 54%,#023e8a 78%,#010b1f)",
-    atmoColor:"#00f5ff",
-    ring:{ color:"#00f5ff", w:3.5, h:0.50, thickness:2 },
-    floatDur:5.5,
-  },
-  skygazing: {
-    r:90, gradient:"radial-gradient(circle at 35% 28%,#e0f7ff,#90e0ef 25%,#4fc3f7 52%,#0277bd 78%,#01295c)",
-    atmoColor:"#90e0ef",
-    ring:{ color:"#90e0ef", w:3.4, h:0.48, thickness:2 },
-    moon:{ r:10, color:"#e8f8ff", orbit:136, speed:13 },
-    floatDur:6,
-  },
-  travel: {
-    r:84, gradient:"radial-gradient(circle at 38% 32%,#ccffcc,#52b788 28%,#2d6a4f 58%,#1b4332 82%,#081c15)",
-    atmoColor:"#52b788",
-    moon:{ r:13, color:"#b7e4c7", orbit:126, speed:8 },
-    floatDur:5,
-  },
-  writing: {
-    r:82, gradient:"radial-gradient(circle at 40% 30%,#fff4cc,#ffd60a 30%,#e85d04 58%,#9d0208 80%,#370617)",
-    atmoColor:"#ffd60a",
-    tail:true,
-    moon:{ r:9, color:"#ffe566", orbit:122, speed:10 },
-    floatDur:4.5,
-  },
-  cinema: {
-    r:96, gradient:"radial-gradient(circle at 36% 27%,#ffd6e7,#ff6b9d 28%,#c9184a 55%,#800f2f 78%,#370617)",
-    atmoColor:"#ff6b9d",
-    ring:{ color:"#ff6b9d", w:3.7, h:0.54, thickness:3 },
-    floatDur:6.5,
-  },
+// ─── Planet configs — only glow colour and size, no CSS drawings ─────────────
+const PLANET: Record<BuildingId, { r: number; atmoColor: string }> = {
+  library:   { r:88,  atmoColor:"#c77dff" },
+  lab:       { r:84,  atmoColor:"#48cae4" },
+  academy:   { r:108, atmoColor:"#f4a261" },
+  shrine:    { r:80,  atmoColor:"#e63946" },
+  arcade:    { r:86,  atmoColor:"#00f5ff" },
+  skygazing: { r:90,  atmoColor:"#90e0ef" },
+  travel:    { r:84,  atmoColor:"#52b788" },
+  writing:   { r:82,  atmoColor:"#ffd60a" },
+  cinema:    { r:96,  atmoColor:"#ff6b9d" },
 };
 
-// ─── Background constants ────────────────────────────────────────────────────
-const STARS = Array.from({ length: 220 }, (_, i) => ({
-  top:  (i*47.3+13)%100,  left: (i*83.7+7)%100,
-  size: i%25===0 ? 3 : i%7===0 ? 2 : 1,
-  dur:  1+(i%5)*0.4,  delay: (i%11)*0.18,
-  color: i%4===0 ? "#a8d8ff" : i%7===0 ? "#fff8b0" : "#ffffff",
-}));
-
-const NEBULAE = [
-  { top:"8%",  left:"5%",  w:260, h:120, color:"#5a0080", dur:6   },
-  { top:"55%", left:"52%", w:300, h:130, color:"#003870", dur:8   },
-  { top:"28%", left:"65%", w:200, h:100, color:"#006050", dur:7   },
-  { top:"72%", left:"12%", w:220, h:90,  color:"#600028", dur:9   },
-  { top:"40%", left:"30%", w:160, h:70,  color:"#1a0060", dur:10  },
-  { top:"18%", left:"40%", w:180, h:80,  color:"#004040", dur:7.5 },
-];
-
-const SHOOT_STARS = Array.from({ length: 7 }, (_, i) => ({
-  top:`${(i*14+3)%75}%`, left:`${(i*19+5)%65}%`,
-  dur:3+i*1.4, delay:i*2.2,
+// ─── Subtle star field (tiny dots only, no CSS drawings) ─────────────────────
+const STARS = Array.from({ length: 180 }, (_, i) => ({
+  top:  (i*47.3+13)%100, left: (i*83.7+7)%100,
+  size: i%30===0 ? 2 : 1,
+  dur:  1.5+(i%5)*0.4,   delay: (i%11)*0.2,
+  color: i%5===0 ? "#a8d8ff" : i%8===0 ? "#fff8b0" : "#ffffff",
 }));
 
 // ─── Collision helpers ───────────────────────────────────────────────────────
@@ -194,150 +125,70 @@ const BUILDING_COMPONENTS: Record<BuildingId, React.ComponentType<{ onClose: ()=
   skygazing:Skygazing, travel:Travel, writing:Writing, cinema:Cinema,
 };
 
-// ─── Planet renderer ─────────────────────────────────────────────────────────
+// ─── Planet renderer — real NASA photo, nothing drawn ────────────────────────
 function Planet({ b, isNear, onClick, imgSrc }: {
   b: Building; isNear: boolean; onClick: ()=>void; imgSrc?: string | null;
 }) {
-  const cfg   = PLANET[b.id];
-  const cx    = b.x*TILE + (b.w*TILE)/2;
-  const cy    = b.y*TILE + (b.h*TILE)/2;
-  const r     = cfg.r;
-  const ringW = cfg.ring ? cfg.ring.w * r : 0;
-  const ringH = cfg.ring ? cfg.ring.h * r : 0;
+  const { r, atmoColor } = PLANET[b.id];
+  const cx = b.x*TILE + (b.w*TILE)/2;
+  const cy = b.y*TILE + (b.h*TILE)/2;
 
   return (
     <Fragment>
-      {/* Outer atmosphere halo */}
+      {/* Glow — real atmospheric light, not a drawing */}
       <div style={{
-        position:"absolute", left:cx-r*1.8, top:cy-r*1.8,
-        width:r*3.6, height:r*3.6, borderRadius:"50%",
-        background:`radial-gradient(circle,${cfg.atmoColor}28 0%,${cfg.atmoColor}10 45%,transparent 70%)`,
-        animation:`atmospherePulse ${cfg.floatDur}s ease-in-out infinite`,
+        position:"absolute",
+        left:cx - r*1.6, top:cy - r*1.6,
+        width:r*3.2, height:r*3.2,
+        borderRadius:"50%",
+        background:`radial-gradient(circle, ${atmoColor}22 0%, ${atmoColor}08 50%, transparent 72%)`,
+        filter:"blur(8px)",
         pointerEvents:"none", zIndex:1,
+        opacity: isNear ? 1 : 0.6,
+        transition:"opacity 0.3s",
       }} />
 
-      {/* Comet tail */}
-      {cfg.tail && (
-        <div style={{
-          position:"absolute", left:cx-r*0.25, top:cy-r*2.6,
-          width:r*0.5, height:r*2.8,
-          background:`linear-gradient(to top,${cfg.atmoColor}70,${cfg.atmoColor}20,transparent)`,
-          borderRadius:"0 0 50% 50%", filter:"blur(6px)",
-          animation:"cometPulse 3s ease-in-out infinite",
-          pointerEvents:"none", zIndex:1,
-        }} />
-      )}
-
-      {/* Ring bottom half */}
-      {cfg.ring && (
-        <div style={{
-          position:"absolute", left:cx-ringW/2, top:cy-ringH/2,
-          width:ringW, height:ringH,
-          border:`${cfg.ring.thickness}px solid ${cfg.ring.color}55`,
-          borderRadius:"50%", boxShadow:`0 0 10px ${cfg.ring.color}30`,
-          pointerEvents:"none", zIndex:2,
-        }} />
-      )}
-
-      {/* Planet body */}
+      {/* Planet — NASA photo only */}
       <div onClick={onClick} style={{
-        position:"absolute", left:cx-r, top:cy-r,
-        width:r*2, height:r*2, borderRadius:"50%",
-        background: imgSrc ? "#000" : cfg.gradient,
+        position:"absolute",
+        left:cx-r, top:cy-r,
+        width:r*2, height:r*2,
+        borderRadius:"50%",
+        overflow:"hidden",
+        cursor:"pointer",
+        zIndex:3,
         boxShadow: isNear
-          ? `0 0 50px ${cfg.atmoColor},0 0 100px ${cfg.atmoColor}55,inset 0 0 30px rgba(0,0,0,0.5)`
-          : `0 0 28px ${cfg.atmoColor}60,inset 0 0 25px rgba(0,0,0,0.45)`,
-        cursor:"pointer", overflow:"hidden", zIndex:3,
+          ? `0 0 0 2px ${atmoColor}, 0 0 40px ${atmoColor}80`
+          : `0 0 0 1px ${atmoColor}40`,
+        transition:"box-shadow 0.3s",
+        background:"#000",
       }}>
-        {/* NASA real image */}
         {imgSrc
-          ? <img src={imgSrc} alt={b.planetLabel} style={{
-              width:"100%", height:"100%", objectFit:"cover",
-              borderRadius:"50%", display:"block",
-            }} />
-          : (
-            /* Fallback icon while loading / offline */
-            <div style={{
+          ? <img src={imgSrc} alt={b.planetLabel}
+              style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
+          : <div style={{
               width:"100%", height:"100%",
-              background:cfg.gradient,
               display:"flex", alignItems:"center", justifyContent:"center",
-              fontSize:r*0.7, userSelect:"none",
-            }}>
-              {FALLBACK_ICONS[b.id]}
-            </div>
-          )
+              fontSize:r*0.65, userSelect:"none",
+              background:"#050510",
+            }}>{FALLBACK_ICONS[b.id]}</div>
         }
-
-        {/* Atmosphere rim overlay (always on top of image) */}
-        <div style={{
-          position:"absolute", inset:0, borderRadius:"50%",
-          background:`radial-gradient(circle,transparent 55%,${cfg.atmoColor}18 75%,${cfg.atmoColor}35 90%,rgba(0,0,0,0.5) 100%)`,
-          pointerEvents:"none",
-        }} />
-
-        {/* Specular highlight */}
-        <div style={{
-          position:"absolute", left:"10%", top:"7%",
-          width:"36%", height:"26%",
-          background:"radial-gradient(circle,rgba(255,255,255,0.32),transparent 70%)",
-          borderRadius:"50%", pointerEvents:"none",
-        }} />
       </div>
-
-      {/* Ring top half */}
-      {cfg.ring && (
-        <div style={{
-          position:"absolute", left:cx-ringW/2, top:cy-ringH/2,
-          width:ringW, height:ringH/2,
-          overflow:"hidden", pointerEvents:"none", zIndex:4,
-        }}>
-          <div style={{
-            width:ringW, height:ringH,
-            border:`${cfg.ring.thickness}px solid ${cfg.ring.color}88`,
-            borderRadius:"50%", boxShadow:`0 0 12px ${cfg.ring.color}40`,
-          }} />
-        </div>
-      )}
-
-      {/* Moon orbit */}
-      {cfg.moon && (
-        <div style={{
-          position:"absolute", left:cx, top:cy, width:0, height:0,
-          animationName:"moonOrbit",
-          animationDuration:`${cfg.moon.speed}s`,
-          animationTimingFunction:"linear",
-          animationIterationCount:"infinite",
-          pointerEvents:"none", zIndex:5,
-        }}>
-          <div style={{
-            position:"absolute",
-            left:cfg.moon.orbit-cfg.moon.r*2, top:-cfg.moon.r*2,
-            width:cfg.moon.r*4, height:cfg.moon.r*4,
-            borderRadius:"50%",
-            background:`radial-gradient(circle,${cfg.moon.color}30,transparent 65%)`,
-          }} />
-          <div style={{
-            position:"absolute",
-            left:cfg.moon.orbit-cfg.moon.r, top:-cfg.moon.r,
-            width:cfg.moon.r*2, height:cfg.moon.r*2, borderRadius:"50%",
-            background:`radial-gradient(circle at 35% 30%,${cfg.moon.color},${cfg.moon.color}88)`,
-            boxShadow:`0 0 8px ${cfg.moon.color}60`,
-          }} />
-        </div>
-      )}
 
       {/* Label */}
       <div style={{
-        position:"absolute", left:cx-r*1.6, top:cy-r-28,
-        width:r*3.2, textAlign:"center",
-        fontFamily:'"Press Start 2P",monospace', fontSize:8,
-        color: isNear ? cfg.atmoColor : `${cfg.atmoColor}bb`,
-        textShadow: isNear
-          ? `0 0 12px ${cfg.atmoColor},0 0 24px ${cfg.atmoColor}80`
-          : `0 0 8px ${cfg.atmoColor}60`,
-        pointerEvents:"none", whiteSpace:"nowrap", zIndex:6,
+        position:"absolute",
+        left:cx-r*1.4, top:cy+r+10,
+        width:r*2.8, textAlign:"center",
+        fontFamily:'"Inter","Share Tech Mono",monospace',
+        fontSize:10, fontWeight:500, letterSpacing:"0.08em",
+        color: isNear ? "#fff" : "rgba(255,255,255,0.5)",
+        textShadow: isNear ? `0 0 16px ${atmoColor}` : "none",
+        pointerEvents:"none", whiteSpace:"nowrap",
+        transition:"color 0.3s",
+        zIndex:6,
       }}>
-        {b.emoji} {b.planetLabel}
+        {b.emoji}  {b.planetLabel}
       </div>
     </Fragment>
   );
@@ -512,8 +363,8 @@ export default function Overworld() {
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 overflow-hidden scanlines"
-      style={{ background:"#000010", cursor:"default", touchAction:"none" }}
+      className="fixed inset-0 overflow-hidden"
+      style={{ background:"#000008", cursor:"default", touchAction:"none" }}
       tabIndex={0}
     >
       {/* ── NASA APOD real galaxy background ── */}
@@ -538,26 +389,6 @@ export default function Overworld() {
         }} />
       ))}
 
-      {/* ── Nebulae ── */}
-      {NEBULAE.map((n, i) => (
-        <div key={i} className="absolute pointer-events-none" style={{
-          top:n.top, left:n.left, width:n.w, height:n.h,
-          background:n.color, borderRadius:"50%", filter:"blur(32px)",
-          animation:`nebulaBreath ${n.dur}s ease-in-out infinite`,
-          animationDelay:`${i*0.8}s`, zIndex:1,
-        }} />
-      ))}
-
-      {/* ── Shooting stars ── */}
-      {SHOOT_STARS.map((s, i) => (
-        <div key={i} className="absolute pointer-events-none" style={{
-          top:s.top, left:s.left, width:2, height:2, borderRadius:1,
-          background:"white", boxShadow:"0 0 4px white",
-          transformOrigin:"left center",
-          animation:`shootStar ${s.dur}s linear infinite`,
-          animationDelay:`${s.delay}s`, zIndex:2,
-        }} />
-      ))}
 
       {/* ── NASA EPIC real Earth – fixed floating sphere ── */}
       <div style={{
@@ -636,57 +467,74 @@ export default function Overworld() {
       </div>
 
       {/* ── HUD ── */}
-      <div className="fixed top-4 left-4 px-4 py-2" style={{
-        background:theme.panel, border:`2px solid ${theme.panelBorder}`,
-        boxShadow:`0 0 12px ${theme.accent}30`, zIndex:40,
+      <div className="fixed top-5 left-5" style={{
+        background:"rgba(0,0,0,0.55)",
+        backdropFilter:"blur(12px)",
+        WebkitBackdropFilter:"blur(12px)",
+        border:"1px solid rgba(255,255,255,0.1)",
+        borderRadius:12, padding:"10px 18px",
+        zIndex:40,
       }}>
-        <p className="font-pixel crt-glow" style={{ fontSize:9, color:theme.accent }}>ROHINI RAJASIMMAN</p>
-        <p className="font-mono opacity-50 mt-0.5" style={{ color:theme.text, fontSize:9 }}>builder · reader · explorer</p>
+        <p style={{ fontSize:13, fontWeight:600, letterSpacing:"0.06em", color:"#fff", margin:0 }}>ROHINI RAJASIMMAN</p>
+        <p style={{ fontSize:11, color:"rgba(255,255,255,0.45)", margin:"2px 0 0", letterSpacing:"0.04em" }}>builder · reader · explorer</p>
       </div>
 
       {/* Near-planet hint */}
       <AnimatePresence>
         {nearBy && !activeBuilding && (() => {
           const bld = BUILDINGS.find(b => b.id === nearBy)!;
-          const pc  = PLANET[nearBy];
+          const { atmoColor } = PLANET[nearBy];
           return (
-            <div className="fixed left-1/2 -translate-x-1/2 px-4 py-2 font-pixel" style={{
-              bottom: isTouchDevice ? 200 : 80,
-              background:theme.panel, border:`2px solid ${pc.atmoColor}`,
-              fontSize:9, color:pc.atmoColor,
-              boxShadow:`0 0 16px ${pc.atmoColor}40`,
-              whiteSpace:"nowrap", zIndex:45,
-            }}>
-              {isTouchDevice ? "TAP A" : "ENTER"} to explore {bld.emoji} {bld.planetLabel}
-            </div>
+            <motion.div
+              initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0, y:8 }}
+              className="fixed left-1/2 -translate-x-1/2"
+              style={{
+                bottom: isTouchDevice ? 210 : 32,
+                background:"rgba(0,0,0,0.65)",
+                backdropFilter:"blur(10px)",
+                WebkitBackdropFilter:"blur(10px)",
+                border:`1px solid ${atmoColor}60`,
+                borderRadius:8, padding:"8px 18px",
+                fontSize:12, color:"#fff",
+                boxShadow:`0 0 20px ${atmoColor}30`,
+                whiteSpace:"nowrap", zIndex:45,
+                letterSpacing:"0.04em",
+              }}>
+              {bld.emoji} {bld.planetLabel} &nbsp;·&nbsp;
+              <span style={{ color:atmoColor }}>{isTouchDevice ? "tap A" : "press Enter"}</span>
+            </motion.div>
           );
         })()}
       </AnimatePresence>
 
       {/* Desktop hint */}
       {!isTouchDevice && (
-        <div className="fixed bottom-4 right-4 font-mono opacity-40 text-right" style={{ fontSize:10, color:theme.text, zIndex:40 }}>
-          ↑↓←→ move · ENTER explore
+        <div className="fixed bottom-5 right-5" style={{ fontSize:11, color:"rgba(255,255,255,0.25)", zIndex:40, letterSpacing:"0.05em" }}>
+          ↑↓←→ move &nbsp;·&nbsp; Enter explore
         </div>
       )}
 
       {/* Mobile D-pad */}
       {isTouchDevice && (
         <div className="fixed z-50 select-none" style={{ bottom:24, right:16 }}>
-          <div style={{ display:"flex", alignItems:"flex-end", gap:12 }}>
+          <div style={{ display:"flex", alignItems:"flex-end", gap:14 }}>
+            {/* A button */}
             <button
               onPointerDown={e=>{ e.preventDefault(); (e.target as HTMLElement).setPointerCapture(e.pointerId); handleDpadPress("Enter"); }}
               onPointerUp={e=>{ e.preventDefault(); handleDpadRelease("Enter"); }}
               onPointerCancel={e=>{ e.preventDefault(); handleDpadRelease("Enter"); }}
               style={{
-                width:52,height:52,borderRadius:"50%",
-                background:`${theme.accent}25`,border:`2px solid ${theme.accent}`,
-                color:theme.accent,fontFamily:'"Press Start 2P",monospace',fontSize:10,
-                display:"flex",alignItems:"center",justifyContent:"center",
-                touchAction:"none",userSelect:"none",marginBottom:24,cursor:"pointer",
+                width:54, height:54, borderRadius:"50%",
+                background:"rgba(255,255,255,0.12)",
+                backdropFilter:"blur(8px)", WebkitBackdropFilter:"blur(8px)",
+                border:"1px solid rgba(255,255,255,0.25)",
+                color:"#fff", fontSize:13, fontWeight:600,
+                display:"flex", alignItems:"center", justifyContent:"center",
+                touchAction:"none", userSelect:"none", marginBottom:26, cursor:"pointer",
               }}
             >A</button>
-            <div style={{ display:"grid",gridTemplateColumns:"repeat(3,50px)",gridTemplateRows:"repeat(3,50px)",gap:3 }}>
+            {/* D-pad */}
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(3,48px)", gridTemplateRows:"repeat(3,48px)", gap:4 }}>
               {([
                 [null,"ArrowUp",null],
                 ["ArrowLeft",null,"ArrowRight"],
@@ -699,15 +547,17 @@ export default function Overworld() {
                     onPointerUp={e=>{ e.preventDefault(); handleDpadRelease(key); }}
                     onPointerCancel={e=>{ e.preventDefault(); handleDpadRelease(key); }}
                     style={{
-                      width:50,height:50,
-                      background:theme.panel,border:`2px solid ${theme.panelBorder}`,
-                      color:theme.accent,fontFamily:'"Press Start 2P",monospace',fontSize:16,
-                      display:"flex",alignItems:"center",justifyContent:"center",
-                      touchAction:"none",userSelect:"none",cursor:"pointer",
+                      width:48, height:48, borderRadius:8,
+                      background:"rgba(255,255,255,0.1)",
+                      backdropFilter:"blur(8px)", WebkitBackdropFilter:"blur(8px)",
+                      border:"1px solid rgba(255,255,255,0.2)",
+                      color:"#fff", fontSize:18,
+                      display:"flex", alignItems:"center", justifyContent:"center",
+                      touchAction:"none", userSelect:"none", cursor:"pointer",
                     }}
                   >{key==="ArrowUp"?"↑":key==="ArrowDown"?"↓":key==="ArrowLeft"?"←":"→"}</button>
                 ) : (
-                  <div key={`${ri}-${ci}`} style={{ width:50,height:50,background:`${theme.panel}60`,border:`1px solid ${theme.panelBorder}20` }} />
+                  <div key={`${ri}-${ci}`} style={{ width:48, height:48 }} />
                 ))
               )}
             </div>
