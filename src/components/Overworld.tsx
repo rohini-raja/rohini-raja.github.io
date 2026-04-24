@@ -109,6 +109,7 @@ export default function Overworld() {
   const konamiRef = useRef<string[]>([]);
   const KONAMI = ["ArrowUp","ArrowUp","ArrowDown","ArrowDown","ArrowLeft","ArrowRight","ArrowLeft","ArrowRight","b","a"];
   const [showKonami, setShowKonami] = useState(false);
+  const [isTouchDevice] = useState(() => typeof window !== "undefined" && ("ontouchstart" in window || navigator.maxTouchPoints > 0));
 
   const SPEED = 90; // px/s
 
@@ -181,6 +182,18 @@ export default function Overworld() {
       window.removeEventListener("keyup", onUp);
     };
   }, [pos.x, pos.y]);
+
+  const handleDpadPress = useCallback((key: string) => {
+    keysRef.current.add(key);
+    if (key === "Enter") {
+      const nb = nearBuilding(pos.x, pos.y);
+      if (nb) setActiveBuilding(nb);
+    }
+  }, [pos.x, pos.y]);
+
+  const handleDpadRelease = useCallback((key: string) => {
+    keysRef.current.delete(key);
+  }, []);
 
   // sudo easter egg
   useEffect(() => {
@@ -421,30 +434,90 @@ export default function Overworld() {
       <AnimatePresence>
         {nearBy && !activeBuilding && (
           <div
-            className="fixed bottom-20 left-1/2 -translate-x-1/2 px-4 py-2 font-pixel"
+            className="fixed left-1/2 -translate-x-1/2 px-4 py-2 font-pixel"
             style={{
+              bottom: isTouchDevice ? 200 : 80,
               background: theme.panel,
               border: `2px solid ${theme.accent}`,
               fontSize: 9,
               color: theme.accent,
               boxShadow: `0 0 16px ${theme.accent}40`,
               whiteSpace: "nowrap",
+              zIndex: 45,
             }}
           >
-            Press ENTER / SPACE to enter{" "}
+            {isTouchDevice ? "TAP" : "ENTER"} to enter{" "}
             {BUILDINGS.find((b) => b.id === nearBy)?.emoji}{" "}
             {BUILDINGS.find((b) => b.id === nearBy)?.label}
           </div>
         )}
       </AnimatePresence>
 
-      {/* Controls hint */}
-      <div
-        className="fixed bottom-4 right-4 font-mono opacity-40 text-right"
-        style={{ fontSize: 10, color: theme.text }}
-      >
-        ↑↓←→ move &nbsp;·&nbsp; ENTER enter
-      </div>
+      {/* Controls hint (desktop only) */}
+      {!isTouchDevice && (
+        <div
+          className="fixed bottom-4 right-4 font-mono opacity-40 text-right"
+          style={{ fontSize: 10, color: theme.text }}
+        >
+          ↑↓←→ move &nbsp;·&nbsp; ENTER enter
+        </div>
+      )}
+
+      {/* Mobile D-pad */}
+      {isTouchDevice && (
+        <div className="fixed z-50" style={{ bottom: 24, right: 16 }}>
+          <div style={{ display: "flex", alignItems: "flex-end", gap: 12 }}>
+            {/* Action button */}
+            <button
+              onTouchStart={(e) => { e.preventDefault(); handleDpadPress("Enter"); }}
+              onTouchEnd={(e) => { e.preventDefault(); handleDpadRelease("Enter"); }}
+              onTouchCancel={(e) => { e.preventDefault(); handleDpadRelease("Enter"); }}
+              style={{
+                width: 52, height: 52, borderRadius: "50%",
+                background: `${theme.accent}30`,
+                border: `2px solid ${theme.accent}`,
+                color: theme.accent,
+                fontFamily: '"Press Start 2P", monospace',
+                fontSize: 9,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                touchAction: "none", userSelect: "none",
+                marginBottom: 20,
+              }}
+            >A</button>
+            {/* D-pad cross */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 48px)", gridTemplateRows: "repeat(3, 48px)", gap: 2 }}>
+              {([
+                [null,       "ArrowUp",    null       ],
+                ["ArrowLeft", null,        "ArrowRight"],
+                [null,       "ArrowDown",  null       ],
+              ] as (string | null)[][]).map((row, ri) =>
+                row.map((key, ci) => key ? (
+                  <button
+                    key={`${ri}-${ci}`}
+                    onTouchStart={(e) => { e.preventDefault(); handleDpadPress(key); }}
+                    onTouchEnd={(e) => { e.preventDefault(); handleDpadRelease(key); }}
+                    onTouchCancel={(e) => { e.preventDefault(); handleDpadRelease(key); }}
+                    style={{
+                      width: 48, height: 48,
+                      background: `${theme.panel}`,
+                      border: `2px solid ${theme.panelBorder}`,
+                      color: theme.accent,
+                      fontFamily: '"Press Start 2P", monospace',
+                      fontSize: 14,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      touchAction: "none", userSelect: "none",
+                    }}
+                  >
+                    {key === "ArrowUp" ? "↑" : key === "ArrowDown" ? "↓" : key === "ArrowLeft" ? "←" : "→"}
+                  </button>
+                ) : (
+                  <div key={`${ri}-${ci}`} style={{ width: 48, height: 48, background: `${theme.panel}60`, border: `1px solid ${theme.panelBorder}20` }} />
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Konami easter egg */}
       <AnimatePresence>
