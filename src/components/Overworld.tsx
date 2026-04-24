@@ -7,8 +7,12 @@ import Lab from "./buildings/Lab";
 import Academy from "./buildings/Academy";
 import Shrine from "./buildings/Shrine";
 import Arcade from "./buildings/Arcade";
+import Skygazing from "./buildings/Skygazing";
+import Travel from "./buildings/Travel";
+import Writing from "./buildings/Writing";
+import Cinema from "./buildings/Cinema";
 
-type BuildingId = "library" | "lab" | "academy" | "shrine" | "arcade";
+type BuildingId = "library" | "lab" | "academy" | "shrine" | "arcade" | "skygazing" | "travel" | "writing" | "cinema";
 type Direction  = "up" | "down" | "left" | "right";
 
 interface Building {
@@ -21,32 +25,47 @@ interface Building {
 }
 
 const TILE  = 32;
-const MAP_W = 28;
-const MAP_H = 20;
+const MAP_W = 30;
+const MAP_H = 30;
 
 const BUILDINGS: Building[] = [
-  { id:"library", label:"LIBRARY", emoji:"📚", x:3,  y:3,  w:4, h:4, color:"#5c3d1e", roofColor:"#8b2e2e", planetLabel:"LIBRARIA" },
-  { id:"lab",     label:"LAB",     emoji:"🔬", x:11, y:3,  w:4, h:4, color:"#1a3a5c", roofColor:"#0a5a8a", planetLabel:"LABRON"   },
-  { id:"academy", label:"ACADEMY", emoji:"🎓", x:19, y:3,  w:5, h:4, color:"#2d1a5c", roofColor:"#6a2a9a", planetLabel:"ACADEM"   },
-  { id:"shrine",  label:"SHRINE",  emoji:"⛩️", x:6,  y:13, w:4, h:4, color:"#5c1a1a", roofColor:"#c04040", planetLabel:"SHRINIA"  },
-  { id:"arcade",  label:"ARCADE",  emoji:"🕹️", x:17, y:13, w:4, h:4, color:"#1a4a1a", roofColor:"#2a8a2a", planetLabel:"ARCADIA"  },
+  // Row 1
+  { id:"library",   label:"LIBRARY",     emoji:"📚", x:3,  y:3,  w:4, h:4, color:"#5c3d1e", roofColor:"#8b2e2e", planetLabel:"LIBRARIA" },
+  { id:"lab",       label:"LAB",         emoji:"🔬", x:11, y:3,  w:4, h:4, color:"#1a3a5c", roofColor:"#0a5a8a", planetLabel:"LABRON"   },
+  { id:"academy",   label:"ACADEMY",     emoji:"🎓", x:19, y:3,  w:5, h:4, color:"#2d1a5c", roofColor:"#6a2a9a", planetLabel:"ACADEM"   },
+  // Row 2
+  { id:"shrine",    label:"SHRINE",      emoji:"⛩️", x:4,  y:13, w:4, h:4, color:"#5c1a1a", roofColor:"#c04040", planetLabel:"SHRINIA"  },
+  { id:"arcade",    label:"ARCADE",      emoji:"🕹️", x:13, y:13, w:4, h:4, color:"#1a4a1a", roofColor:"#2a8a2a", planetLabel:"ARCADIA"  },
+  { id:"skygazing", label:"OBSERVATORY", emoji:"🔭", x:21, y:13, w:4, h:4, color:"#0a1a3a", roofColor:"#1a3a6a", planetLabel:"CELESTIA" },
+  // Row 3
+  { id:"travel",    label:"ATLAS",       emoji:"🌏", x:3,  y:23, w:4, h:4, color:"#0a3a1a", roofColor:"#1a6a3a", planetLabel:"NOMADIA"  },
+  { id:"writing",   label:"SCRIPTORIUM", emoji:"✍️", x:12, y:23, w:4, h:4, color:"#3a2a0a", roofColor:"#6a4a1a", planetLabel:"SCRIBOS"  },
+  { id:"cinema",    label:"CINEMA",      emoji:"🎬", x:21, y:23, w:4, h:4, color:"#3a0a3a", roofColor:"#6a1a6a", planetLabel:"SCREENIX" },
 ];
 
 // ─── NASA image queries per planet ──────────────────────────────────────────
 const NASA_QUERIES: Record<BuildingId, string> = {
-  library:  "hubble deep field galaxy",
-  lab:      "earth from space blue marble",
-  academy:  "jupiter planet juno",
-  shrine:   "mars planet global view",
-  arcade:   "saturn rings cassini",
+  library:   "hubble deep field galaxy",
+  lab:       "earth from space blue marble",
+  academy:   "jupiter planet juno",
+  shrine:    "mars planet global view",
+  arcade:    "saturn rings cassini",
+  skygazing: "milky way stars nebula night sky",
+  travel:    "earth continents africa europe from space",
+  writing:   "cosmic dust pillar star formation nebula",
+  cinema:    "aurora borealis northern lights from space",
 };
 
 const FALLBACK_ICONS: Record<BuildingId, string> = {
-  library:  "🌌",
-  lab:      "🌍",
-  academy:  "🪐",
-  shrine:   "🔴",
-  arcade:   "💫",
+  library:   "🌌",
+  lab:       "🌍",
+  academy:   "🪐",
+  shrine:    "🔴",
+  arcade:    "💫",
+  skygazing: "🔭",
+  travel:    "🗺️",
+  writing:   "✍️",
+  cinema:    "🎬",
 };
 
 // ─── Planet visual configs ───────────────────────────────────────────────────
@@ -89,6 +108,32 @@ const PLANET: Record<BuildingId, {
     ring:{ color:"#00f5ff", w:3.5, h:0.50, thickness:2 },
     floatDur:5.5,
   },
+  skygazing: {
+    r:90, gradient:"radial-gradient(circle at 35% 28%,#e0f7ff,#90e0ef 25%,#4fc3f7 52%,#0277bd 78%,#01295c)",
+    atmoColor:"#90e0ef",
+    ring:{ color:"#90e0ef", w:3.4, h:0.48, thickness:2 },
+    moon:{ r:10, color:"#e8f8ff", orbit:136, speed:13 },
+    floatDur:6,
+  },
+  travel: {
+    r:84, gradient:"radial-gradient(circle at 38% 32%,#ccffcc,#52b788 28%,#2d6a4f 58%,#1b4332 82%,#081c15)",
+    atmoColor:"#52b788",
+    moon:{ r:13, color:"#b7e4c7", orbit:126, speed:8 },
+    floatDur:5,
+  },
+  writing: {
+    r:82, gradient:"radial-gradient(circle at 40% 30%,#fff4cc,#ffd60a 30%,#e85d04 58%,#9d0208 80%,#370617)",
+    atmoColor:"#ffd60a",
+    tail:true,
+    moon:{ r:9, color:"#ffe566", orbit:122, speed:10 },
+    floatDur:4.5,
+  },
+  cinema: {
+    r:96, gradient:"radial-gradient(circle at 36% 27%,#ffd6e7,#ff6b9d 28%,#c9184a 55%,#800f2f 78%,#370617)",
+    atmoColor:"#ff6b9d",
+    ring:{ color:"#ff6b9d", w:3.7, h:0.54, thickness:3 },
+    floatDur:6.5,
+  },
 };
 
 // ─── Background constants ────────────────────────────────────────────────────
@@ -120,6 +165,7 @@ const WATER_TILES = [
   { x:0,      y:0,      w:MAP_W,  h:2     },
   { x:0,      y:MAP_H-2,w:MAP_W,  h:2     },
   { x:8,      y:8,      w:3,      h:3     },
+  { x:8,      y:18,     w:3,      h:3     },
 ];
 
 function isSolid(px: number, py: number): boolean {
@@ -145,6 +191,7 @@ function nearBuilding(px: number, py: number): BuildingId | null {
 
 const BUILDING_COMPONENTS: Record<BuildingId, React.ComponentType<{ onClose: ()=>void }>> = {
   library:Library, lab:Lab, academy:Academy, shrine:Shrine, arcade:Arcade,
+  skygazing:Skygazing, travel:Travel, writing:Writing, cinema:Cinema,
 };
 
 // ─── Planet renderer ─────────────────────────────────────────────────────────
@@ -556,7 +603,9 @@ export default function Overworld() {
         {/* Asteroids (trees) */}
         {[
           [9,5],[10,6],[9,10],[15,6],[16,10],[22,6],[23,7],
-          [4,16],[8,16],[14,16],[20,16],[24,16],[25,10],
+          [2,11],[11,11],[19,11],[27,11],
+          [2,19],[11,19],[19,19],[27,19],
+          [7,25],[16,25],[25,25],
         ].map(([tx,ty], i) => (
           <div key={i} style={{
             position:"absolute", left:tx!*TILE+2, top:ty!*TILE+4,
