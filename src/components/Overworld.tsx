@@ -81,13 +81,6 @@ const PLANET: Record<BuildingId, { r: number; atmoColor: string }> = {
   cinema:    { r:96,  atmoColor:"#ff6b9d" },
 };
 
-// ─── Subtle star field (tiny dots only, no CSS drawings) ─────────────────────
-const STARS = Array.from({ length: 180 }, (_, i) => ({
-  top:  (i*47.3+13)%100, left: (i*83.7+7)%100,
-  size: i%30===0 ? 2 : 1,
-  dur:  1.5+(i%5)*0.4,   delay: (i%11)*0.2,
-  color: i%5===0 ? "#a8d8ff" : i%8===0 ? "#fff8b0" : "#ffffff",
-}));
 
 // ─── Collision helpers ───────────────────────────────────────────────────────
 const WATER_TILES = [
@@ -364,30 +357,20 @@ export default function Overworld() {
     <div
       ref={containerRef}
       className="fixed inset-0 overflow-hidden"
-      style={{ background:"#000008", cursor:"default", touchAction:"none" }}
+      style={{ background:"transparent", cursor:"default", touchAction:"none" }}
       tabIndex={0}
     >
-      {/* ── NASA APOD real galaxy background ── */}
-      {nasaBg && (
-        <div style={{
-          position:"fixed", inset:0,
-          backgroundImage:`url(${nasaBg})`,
-          backgroundSize:"cover", backgroundPosition:"center",
-          filter:"brightness(0.35) saturate(1.5)",
-          zIndex:0, pointerEvents:"none",
-        }} />
-      )}
-
-      {/* ── Stars (always on, denser with NASA bg) ── */}
-      {STARS.map((s, i) => (
-        <div key={i} className="absolute rounded-full pointer-events-none" style={{
-          width:s.size, height:s.size, background:s.color,
-          top:`${s.top}%`, left:`${s.left}%`,
-          opacity: nasaBg ? 0.35+(i%4)*0.08 : 0.55+(i%4)*0.12,
-          animation:`twinkle ${s.dur}s ease-in-out infinite`,
-          animationDelay:`${s.delay}s`, zIndex:1,
-        }} />
-      ))}
+      {/* ── NASA galaxy background — full brightness, no CSS overlay ── */}
+      {nasaBg
+        ? <img src={nasaBg} alt="NASA galaxy" style={{
+            position:"fixed", inset:0,
+            width:"100%", height:"100%",
+            objectFit:"cover", objectPosition:"center",
+            zIndex:0, pointerEvents:"none",
+            display:"block",
+          }} />
+        : <div style={{ position:"fixed", inset:0, background:"#000", zIndex:0 }} />
+      }
 
 
       {/* ── NASA EPIC real Earth – fixed floating sphere ── */}
@@ -414,11 +397,8 @@ export default function Overworld() {
         transform:`translate(${-camX}px,${-camY}px)`,
         willChange:"transform", zIndex:3,
       }}>
-        {/* Ground void */}
-        <div style={{
-          position:"absolute", inset:0,
-          background:"radial-gradient(ellipse at 50% 50%,#00001e 0%,#000010 60%,#000008)",
-        }} />
+        {/* Ground — transparent so NASA galaxy shows through */}
+        <div style={{ position:"absolute", inset:0, background:"transparent" }} />
 
         {/* Black holes (water) */}
         {WATER_TILES.map((w, i) => (
