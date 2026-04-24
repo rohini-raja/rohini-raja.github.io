@@ -373,23 +373,6 @@ export default function Overworld() {
       }
 
 
-      {/* ── NASA EPIC real Earth – fixed floating sphere ── */}
-      <div style={{
-        position:"fixed", right:-70, bottom:-70,
-        width:400, height:400, borderRadius:"50%",
-        overflow:"hidden", zIndex:2, pointerEvents:"none",
-        boxShadow:"0 0 70px rgba(50,140,255,0.5),0 0 180px rgba(30,80,200,0.2)",
-      }}>
-        {epicUrl
-          ? <img src={epicUrl} alt="Live Earth" style={{ width:"100%",height:"100%",objectFit:"cover" }} />
-          : <div style={{ width:"100%",height:"100%",background:"radial-gradient(circle at 40% 35%,#1a6b9a,#0a3d62 45%,#020d1a)" }} />
-        }
-        <div style={{
-          position:"absolute", inset:0, borderRadius:"50%",
-          background:"radial-gradient(circle,transparent 58%,rgba(50,140,255,0.2) 75%,rgba(60,160,255,0.5) 92%,rgba(40,110,200,0.65) 100%)",
-        }} />
-      </div>
-
       {/* ── Map ── */}
       <div style={{
         width:MAP_W*TILE, height:MAP_H*TILE,
