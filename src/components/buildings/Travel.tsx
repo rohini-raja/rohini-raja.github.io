@@ -1,80 +1,119 @@
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useTheme } from "../../lib/ThemeContext";
 
 interface Props { onClose: () => void }
 
-const VISITED = [
-  { place: "Coorg, India", flag: "🌿", note: "Misty coffee hills, the kind of quiet that resets everything." },
-  { place: "Hampi, India", flag: "🪨", note: "Ancient ruins in a surreal boulder landscape. Time feels different here." },
-  { place: "Pondicherry, India", flag: "🌊", note: "French colonial streets, the sea at dawn, existential peace." },
-  { place: "Ooty, India", flag: "🚂", note: "Toy train through the Nilgiris. Windows down, tea in hand." },
-  { place: "Mysore, India", flag: "🏰", note: "Palace lights on Sunday evenings — I could watch it for hours." },
-];
+const COLOR = "#52b788";
 
-const WISHLIST = [
-  { place: "Patagonia, Argentina", flag: "🏔️", note: "Torres del Paine. End of the world energy." },
-  { place: "Kyoto, Japan", flag: "🍁", note: "Autumn leaves in Arashiyama. My most-wanted season." },
-  { place: "Iceland", flag: "🌋", note: "Midnight sun, northern lights, and absolute geological drama." },
-  { place: "Varanasi, India", flag: "🕯️", note: "The Ganga aarti at dusk. Something I keep postponing." },
-  { place: "Sahara Desert", flag: "🏜️", note: "Sleep under stars with zero light pollution. One day." },
+const LOCATIONS = [
+  { name: "Amazon Rainforest", lat: -3.4653, lon: -62.2159, emoji: "🌿" },
+  { name: "Himalayas", lat: 27.9881, lon: 86.9250, emoji: "🏔️" },
+  { name: "Sahara Desert", lat: 23.4162, lon: 25.6628, emoji: "🏜️" },
+  { name: "Great Barrier Reef", lat: -18.2871, lon: 147.6992, emoji: "🐠" },
+  { name: "Aurora Zone, Norway", lat: 69.6496, lon: 18.9560, emoji: "🌌" },
+  { name: "Grand Canyon", lat: 36.1069, lon: -112.1129, emoji: "🏜️" },
 ];
 
 export default function Travel({ onClose }: Props) {
   const { theme } = useTheme();
+  const [images, setImages] = useState<Record<string, string>>({});
+  const [loading, setLoading] = useState(true);
+  const [active, setActive] = useState<string | null>(null);
+
+  useEffect(() => {
+    const today = new Date().toISOString().slice(0, 10);
+    let done = 0;
+    const results: Record<string, string> = {};
+
+    LOCATIONS.forEach(loc => {
+      const url = `https://api.nasa.gov/planetary/earth/imagery?lat=${loc.lat}&lon=${loc.lon}&dim=0.1&date=${today}&api_key=DEMO_KEY`;
+      // Store the direct image URL — NASA returns a PNG directly
+      results[loc.name] = url;
+      done++;
+      if (done === LOCATIONS.length) {
+        setImages(results);
+        setLoading(false);
+      }
+    });
+  }, []);
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.9 }}
+      initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }}
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
       style={{ background: "rgba(0,0,0,0.85)" }}
     >
       <div className="relative w-full max-w-2xl max-h-[85vh] overflow-y-auto"
-        style={{ background: theme.panel, border: `3px solid #52b788`, boxShadow: `0 0 40px #52b78840` }}>
+        style={{ background: theme.panel, border: `3px solid ${COLOR}`, boxShadow: `0 0 40px ${COLOR}40` }}>
 
         <div className="sticky top-0 flex items-center justify-between px-6 py-4"
-          style={{ background: theme.panel, borderBottom: `2px solid #52b78850` }}>
+          style={{ background: theme.panel, borderBottom: `2px solid ${COLOR}40` }}>
           <div>
-            <h2 className="font-pixel" style={{ color: "#52b788", fontSize: 14 }}>🌏 ATLAS</h2>
-            <p className="font-mono text-xs opacity-60 mt-1" style={{ color: theme.text }}>Places that changed me</p>
+            <h2 className="font-pixel" style={{ color: COLOR, fontSize: 14 }}>🌏 EARTH FROM ORBIT</h2>
+            <p className="font-mono text-xs opacity-50 mt-1" style={{ color: theme.text }}>NASA Earth Observatory — live satellite imagery</p>
           </div>
-          <button onClick={onClose} className="font-pixel px-3 py-1 text-xs transition-all hover:scale-110"
-            style={{ border: `1px solid #52b788`, color: theme.text }}>✕ EXIT</button>
+          <button onClick={onClose} className="font-pixel px-3 py-1 text-xs hover:scale-110 transition-all"
+            style={{ border: `1px solid ${COLOR}`, color: theme.text }}>✕ EXIT</button>
         </div>
 
         <div className="p-6">
-          <p className="font-pixel mb-4" style={{ fontSize: 8, color: "#52b788" }}>// BEEN THERE</p>
-          <div className="space-y-3 mb-8">
-            {VISITED.map((v, i) => (
-              <motion.div key={v.place}
-                initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.07 }}
-                className="flex gap-3 p-3"
-                style={{ border: `1px solid #52b78820`, background: "#52b78808" }}>
-                <span className="text-xl flex-shrink-0">{v.flag}</span>
-                <div>
-                  <p className="font-pixel mb-1" style={{ fontSize: 9, color: "#52b788" }}>{v.place}</p>
-                  <p className="font-mono text-xs opacity-70" style={{ color: theme.text }}>{v.note}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+          {loading ? (
+            <div className="text-center font-pixel py-12" style={{ fontSize: 9, color: COLOR }}>
+              <div className="blink">ACQUIRING SATELLITE LOCK...</div>
+            </div>
+          ) : (
+            <>
+              <p className="font-pixel mb-4" style={{ fontSize: 8, color: COLOR }}>// SELECT A LOCATION</p>
+              <div className="grid grid-cols-2 gap-3">
+                {LOCATIONS.map((loc, i) => (
+                  <motion.button
+                    key={loc.name}
+                    initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.07 }}
+                    onClick={() => setActive(active === loc.name ? null : loc.name)}
+                    className="text-left p-3 transition-all"
+                    style={{
+                      border: `1px solid ${active === loc.name ? COLOR : `${COLOR}30`}`,
+                      background: active === loc.name ? `${COLOR}15` : `${COLOR}05`,
+                    }}
+                  >
+                    <span className="text-lg block mb-1">{loc.emoji}</span>
+                    <span className="font-pixel block" style={{ fontSize: 7, color: COLOR }}>{loc.name}</span>
+                    <span className="font-mono text-xs opacity-40 block mt-0.5" style={{ color: theme.text }}>
+                      {loc.lat.toFixed(2)}°, {loc.lon.toFixed(2)}°
+                    </span>
+                  </motion.button>
+                ))}
+              </div>
 
-          <p className="font-pixel mb-4" style={{ fontSize: 8, color: "#52b788" }}>// NEXT COORDINATES</p>
-          <div className="space-y-3">
-            {WISHLIST.map((w, i) => (
-              <motion.div key={w.place}
-                initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.35 + i * 0.07 }}
-                className="flex gap-3 p-3"
-                style={{ border: `1px dashed #52b78828`, background: "#52b78804", opacity: 0.85 }}>
-                <span className="text-xl flex-shrink-0">{w.flag}</span>
-                <div>
-                  <p className="font-pixel mb-1" style={{ fontSize: 9, color: "#52b78888" }}>{w.place}</p>
-                  <p className="font-mono text-xs opacity-60" style={{ color: theme.text }}>{w.note}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+              {active && images[active] && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }}
+                  className="mt-4 overflow-hidden"
+                >
+                  <p className="font-pixel mb-2" style={{ fontSize: 8, color: COLOR }}>// SATELLITE VIEW: {active.toUpperCase()}</p>
+                  <div style={{ position: "relative", width: "100%", paddingTop: "100%", background: "#000" }}>
+                    <img
+                      src={images[active]}
+                      alt={active}
+                      style={{
+                        position: "absolute", inset: 0,
+                        width: "100%", height: "100%",
+                        objectFit: "cover",
+                        imageRendering: "pixelated",
+                      }}
+                      onError={e => { (e.target as HTMLImageElement).style.display = "none"; }}
+                    />
+                    <div style={{
+                      position: "absolute", bottom: 8, right: 8,
+                      fontFamily: "monospace", fontSize: 9, color: `${COLOR}cc`,
+                      background: "rgba(0,0,0,0.6)", padding: "2px 6px",
+                    }}>NASA Earth Observatory</div>
+                  </div>
+                </motion.div>
+              )}
+            </>
+          )}
         </div>
       </div>
     </motion.div>
