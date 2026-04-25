@@ -423,15 +423,29 @@ export default function Overworld() {
 
       {/* ── HUD ── */}
       <div className="fixed top-5 left-5" style={{
-        background:"rgba(0,0,0,0.55)",
-        backdropFilter:"blur(12px)",
-        WebkitBackdropFilter:"blur(12px)",
-        border:"1px solid rgba(255,255,255,0.1)",
-        borderRadius:12, padding:"10px 18px",
-        zIndex:40,
+        background:"rgba(0,0,0,0.60)",
+        backdropFilter:"blur(14px)",
+        WebkitBackdropFilter:"blur(14px)",
+        border:"1px solid rgba(255,255,255,0.12)",
+        borderRadius:14, padding:"12px 20px",
+        zIndex:40, maxWidth:260,
       }}>
-        <p style={{ fontSize:13, fontWeight:600, letterSpacing:"0.06em", color:"#fff", margin:0 }}>ROHINI RAJASIMMAN</p>
-        <p style={{ fontSize:11, color:"rgba(255,255,255,0.45)", margin:"2px 0 0", letterSpacing:"0.04em" }}>builder · reader · explorer</p>
+        <p style={{ fontSize:13, fontWeight:700, letterSpacing:"0.07em", color:"#fff", margin:0 }}>ROHINI RAJASIMMAN</p>
+        <p style={{ fontSize:10, color:"rgba(255,255,255,0.45)", margin:"3px 0 8px", letterSpacing:"0.05em" }}>builder · reader · explorer</p>
+        <div style={{ width:"100%", height:1, background:"rgba(255,255,255,0.08)", marginBottom:8 }} />
+        <p style={{ fontSize:10, color:"rgba(255,255,255,0.7)", margin:0, lineHeight:1.65, letterSpacing:"0.02em" }}>
+          Software engineer passionate about building products that sit at the intersection of technology and human experience.
+          Loves space, stories, and shipping things that matter.
+        </p>
+        <div style={{ marginTop:8, display:"flex", gap:6, flexWrap:"wrap" }}>
+          {["Software Eng","Space Nerd","Avid Reader","Cinephile"].map(tag => (
+            <span key={tag} style={{
+              fontSize:8, padding:"2px 7px", borderRadius:20,
+              border:"1px solid rgba(255,255,255,0.15)",
+              color:"rgba(255,255,255,0.5)", letterSpacing:"0.04em",
+            }}>{tag}</span>
+          ))}
+        </div>
       </div>
 
       {/* Near-planet hint */}
