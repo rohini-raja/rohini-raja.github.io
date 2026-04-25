@@ -14,8 +14,9 @@ import Travel from "./buildings/Travel";
 import Writing from "./buildings/Writing";
 import Cinema from "./buildings/Cinema";
 import Instagram from "./buildings/Instagram";
+import LinkedIn from "./buildings/LinkedIn";
 
-type BuildingId = "library" | "lab" | "academy" | "shrine" | "arcade" | "skygazing" | "travel" | "writing" | "cinema" | "instagram";
+type BuildingId = "library" | "lab" | "academy" | "shrine" | "arcade" | "skygazing" | "travel" | "writing" | "cinema" | "instagram" | "linkedin";
 type Direction  = "up" | "down" | "left" | "right";
 
 interface Building {
@@ -42,6 +43,7 @@ const BUILDINGS: Building[] = [
   { id:"travel",    label:"ATLAS",       emoji:"🌏", planetLabel:"NOMADIA"  },
   { id:"writing",   label:"SCRIPTORIUM", emoji:"✍️", planetLabel:"SCRIBOS"  },
   { id:"instagram", label:"INSTAGRAM",   emoji:"📸", planetLabel:"CURIOSIA" },
+  { id:"linkedin",  label:"LINKEDIN",    emoji:"💼", planetLabel:"NEXORIA"  },
 ];
 
 // ─── NASA image queries per planet ──────────────────────────────────────────
@@ -56,6 +58,7 @@ const NASA_QUERIES: Record<BuildingId, string> = {
   writing:   "cosmic dust pillar star formation nebula",
   cinema:    "aurora borealis northern lights from space",
   instagram: "colorful nebula pink purple cosmic cloud",
+  linkedin:  "blue planet ocean earth from space",
 };
 
 const FALLBACK_ICONS: Record<BuildingId, string> = {
@@ -69,6 +72,7 @@ const FALLBACK_ICONS: Record<BuildingId, string> = {
   writing:   "✍️",
   cinema:    "🎬",
   instagram: "📸",
+  linkedin:  "💼",
 };
 
 // ─── Planet configs — solar-system layout (orbit around central sun) ─────────
@@ -86,6 +90,7 @@ const PLANET: Record<BuildingId, PlanetCfg> = {
   travel:    { r:32, atmoColor:"#52b788", orbitalR:660, orbitPeriod:178, startAngle:0.78, spinPeriod:25 },
   writing:   { r:30, atmoColor:"#ffd60a", orbitalR:730, orbitPeriod:210, startAngle:0.10, spinPeriod:32 },
   instagram: { r:32, atmoColor:"#e1306c", orbitalR:810, orbitPeriod:245, startAngle:0.38, spinPeriod:20 },
+  linkedin:  { r:30, atmoColor:"#378fe9", orbitalR:890, orbitPeriod:285, startAngle:0.62, spinPeriod:26 },
 };
 
 // 72-step elliptical orbit keyframes around the central sun
@@ -134,7 +139,7 @@ function nearBuilding(px: number, py: number): BuildingId | null {
 
 const BUILDING_COMPONENTS: Record<BuildingId, React.ComponentType<{ onClose: ()=>void }>> = {
   library:Library, lab:Lab, academy:Academy, shrine:Shrine, arcade:Arcade,
-  skygazing:Skygazing, travel:Travel, writing:Writing, cinema:Cinema, instagram:Instagram,
+  skygazing:Skygazing, travel:Travel, writing:Writing, cinema:Cinema, instagram:Instagram, linkedin:LinkedIn,
 };
 
 const PLANET_DESCRIPTIONS: Record<BuildingId, string> = {
@@ -148,6 +153,7 @@ const PLANET_DESCRIPTIONS: Record<BuildingId, string> = {
   writing:   "Stories & Writing",
   cinema:    "Films & Cinema",
   instagram: "@curiously.roo",
+  linkedin:  "in/rohini-raja",
 };
 
 // ─── Planet renderer — orbiting wrapper + NASA photo ─────────────────────────
