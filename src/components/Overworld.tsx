@@ -57,7 +57,7 @@ const NASA_QUERIES: Record<BuildingId, string> = {
   travel:    "earth continents africa europe from space",
   writing:   "cosmic dust pillar star formation nebula",
   cinema:    "aurora borealis northern lights from space",
-  instagram: "colorful nebula pink purple cosmic cloud",
+  instagram: "saturn planet rings cassini",
   linkedin:  "blue planet ocean earth from space",
 };
 
@@ -89,7 +89,7 @@ const PLANET: Record<BuildingId, PlanetCfg> = {
   skygazing: { r:36, atmoColor:"#90e0ef", orbitalR:590, orbitPeriod:148, startAngle:0.55, spinPeriod:30 },
   travel:    { r:32, atmoColor:"#52b788", orbitalR:660, orbitPeriod:178, startAngle:0.78, spinPeriod:25 },
   writing:   { r:30, atmoColor:"#ffd60a", orbitalR:730, orbitPeriod:210, startAngle:0.10, spinPeriod:32 },
-  instagram: { r:32, atmoColor:"#e1306c", orbitalR:810, orbitPeriod:245, startAngle:0.38, spinPeriod:20 },
+  instagram: { r:32, atmoColor:"#d4a843", orbitalR:810, orbitPeriod:245, startAngle:0.38, spinPeriod:20 },
   linkedin:  { r:30, atmoColor:"#378fe9", orbitalR:890, orbitPeriod:285, startAngle:0.62, spinPeriod:26 },
 };
 
@@ -195,6 +195,21 @@ function Planet({ b, isNear, onClick, imgSrc }: {
           )}
         </AnimatePresence>
 
+        {/* Saturn back ring — renders behind planet disk */}
+        {b.id === "instagram" && (
+          <div style={{
+            position:"absolute",
+            left:-(r*2.3), top:-(r*0.28),
+            width:r*4.6, height:r*0.72,
+            borderRadius:"50%",
+            border:`${Math.max(4,r*0.16)}px solid`,
+            borderColor:"rgba(210,175,100,0.45) rgba(190,155,80,0.35) rgba(170,135,60,0.28) rgba(190,155,80,0.35)",
+            background:"transparent",
+            clipPath:"inset(0 0 50% 0)",
+            pointerEvents:"none", zIndex:1,
+          }} />
+        )}
+
         {/* Planet clickable area */}
         <div
           onClick={e => { e.stopPropagation(); onClick(); }}
@@ -205,6 +220,7 @@ function Planet({ b, isNear, onClick, imgSrc }: {
             width:r*2, height:r*2,
             borderRadius:"50%", overflow:"hidden",
             cursor:"pointer",
+            zIndex: b.id === "instagram" ? 2 : undefined,
             filter: lit
               ? `drop-shadow(0 0 ${r*0.3}px ${atmoColor}) drop-shadow(0 0 ${r*0.6}px ${atmoColor}70)`
               : `drop-shadow(0 0 ${r*0.12}px ${atmoColor}50)`,
@@ -230,6 +246,21 @@ function Planet({ b, isNear, onClick, imgSrc }: {
           <div style={{ position:"absolute", inset:0, borderRadius:"50%", pointerEvents:"none",
             background:"radial-gradient(circle at 28% 28%, rgba(255,255,255,0.14) 0%, transparent 48%)" }} />
         </div>
+
+        {/* Saturn front ring — renders in front of planet disk */}
+        {b.id === "instagram" && (
+          <div style={{
+            position:"absolute",
+            left:-(r*2.3), top:-(r*0.28),
+            width:r*4.6, height:r*0.72,
+            borderRadius:"50%",
+            border:`${Math.max(4,r*0.16)}px solid`,
+            borderColor:"rgba(225,190,110,0.7) rgba(205,170,90,0.6) rgba(185,150,70,0.5) rgba(205,170,90,0.6)",
+            background:"transparent",
+            clipPath:"inset(50% 0 0 0)",
+            pointerEvents:"none", zIndex:3,
+          }} />
+        )}
 
         {/* Label */}
         <div style={{
