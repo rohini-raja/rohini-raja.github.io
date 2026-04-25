@@ -94,8 +94,16 @@ const ORBIT_KEYFRAMES = Object.entries(PLANET).map(([id, p]) => {
   return `@keyframes orbit-${id} {\n${steps}\n}`;
 }).join("\n\n")
   + `\n\n@keyframes planet-spin {\n  from { transform: scale(1.15) rotate(0deg); }\n  to   { transform: scale(1.15) rotate(360deg); }\n}`
-  + `\n\n@keyframes sun-pulse {\n  0%,100% { transform: scale(1);    opacity: 1;   }\n  50%     { transform: scale(1.04); opacity: 0.93; }\n}`
-  + `\n\n@keyframes sun-corona {\n  from { transform: rotate(0deg); }\n  to   { transform: rotate(360deg); }\n}`;
+  + (() => {
+    const MOON_R = 65, MOON_FLAT = 0.88;
+    const steps = Array.from({ length: 73 }, (_, i) => {
+      const a = (i / 72) * Math.PI * 2;
+      const x = (MOON_R * Math.cos(a)).toFixed(2);
+      const y = (MOON_R * Math.sin(a) * MOON_FLAT).toFixed(2);
+      return `  ${((i / 72) * 100).toFixed(3)}% { transform: translate(${x}px,${y}px); }`;
+    }).join("\n");
+    return `\n\n@keyframes orbit-moon {\n${steps}\n}`;
+  })();
 
 
 // ─── Collision: just keep the ship inside the map ────────────────────────────
@@ -135,60 +143,6 @@ const PLANET_DESCRIPTIONS: Record<BuildingId, string> = {
   writing:   "Stories & Writing",
   cinema:    "Films & Cinema",
 };
-
-// ─── Sun canvas — luminance → alpha so black background vanishes ─────────────
-function SunCanvas({ size }: { size: number }) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d", { willReadFrequently: true });
-    if (!ctx) return;
-
-    const drawFallback = () => {
-      const g = ctx.createRadialGradient(size/2,size/2,0, size/2,size/2,size/2);
-      g.addColorStop(0,    "#ffffff");
-      g.addColorStop(0.06, "#fff9c0");
-      g.addColorStop(0.18, "#ffe566");
-      g.addColorStop(0.36, "#ffb820");
-      g.addColorStop(0.56, "#ff8000");
-      g.addColorStop(0.74, "#d94000");
-      g.addColorStop(0.88, "#8b1a00");
-      g.addColorStop(1,    "rgba(0,0,0,0)");
-      ctx.clearRect(0, 0, size, size);
-      ctx.beginPath();
-      ctx.arc(size/2, size/2, size/2, 0, Math.PI*2);
-      ctx.fillStyle = g;
-      ctx.fill();
-    };
-
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-    img.onload = () => {
-      ctx.clearRect(0, 0, size, size);
-      ctx.drawImage(img, 0, 0, size, size);
-      try {
-        const d = ctx.getImageData(0, 0, size, size);
-        for (let i = 0; i < d.data.length; i += 4) {
-          const lum = d.data[i]*0.299 + d.data[i+1]*0.587 + d.data[i+2]*0.114;
-          d.data[i+3] = Math.min(255, Math.round(lum * 2.8));
-        }
-        ctx.putImageData(d, 0, 0);
-      } catch { drawFallback(); }
-    };
-    img.onerror = drawFallback;
-    img.src = "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_512_HMIIF.jpg";
-  }, [size]);
-
-  return (
-    <canvas
-      ref={canvasRef}
-      width={size}
-      height={size}
-      style={{ display:"block", width:size, height:size }}
-    />
-  );
-}
 
 // ─── Planet renderer — orbiting wrapper + NASA photo ─────────────────────────
 function Planet({ b, isNear, onClick, imgSrc }: {
@@ -278,6 +232,26 @@ function Planet({ b, isNear, onClick, imgSrc }: {
         }}>
           {b.emoji} {b.planetLabel}
         </div>
+
+        {/* Moon — only for Earth (lab) */}
+        {b.id === "lab" && (
+          <div style={{
+            position:"absolute", left:0, top:0,
+            animation:"orbit-moon 10s linear infinite",
+            pointerEvents:"none", zIndex:6,
+          }}>
+            <div style={{
+              position:"absolute", left:-10, top:-10,
+              width:20, height:20, borderRadius:"50%",
+              background:`radial-gradient(circle at 38% 32%,
+                #f0f0ec 0%, #d0cfc8 30%, #a8a89e 60%, #6a6a62 85%, #3a3a34 100%)`,
+              boxShadow:`
+                inset -3px -2px 6px rgba(0,0,0,0.55),
+                inset 2px 2px 4px rgba(255,255,255,0.12),
+                0 0 8px rgba(220,220,200,0.18)`,
+            }} />
+          </div>
+        )}
       </div>
     </Fragment>
   );
@@ -619,22 +593,6 @@ export default function Overworld() {
         {/* Ground — transparent so the galaxy shows through */}
         <div style={{ position:"absolute", inset:0, background:"transparent" }} />
 
-        {/* Sun — glow halo + canvas (luminance→alpha removes black bg) */}
-        <div style={{
-          position:"absolute",
-          left: SUN_CX - 80, top: SUN_CY - 80,
-          width: 160, height: 160, borderRadius:"50%",
-          boxShadow:`
-            0 0 55px  rgba(255,210,80,0.95),
-            0 0 120px rgba(255,160,50,0.72),
-            0 0 240px rgba(255,120,20,0.44),
-            0 0 440px rgba(255,90,10,0.2)`,
-          animation:"sun-pulse 6s ease-in-out infinite",
-          pointerEvents:"none", zIndex:1,
-          overflow:"hidden",
-        }}>
-          <SunCanvas size={160} />
-        </div>
 
         {/* Distant asteroids (decorative — scattered, not obstacles) */}
         {Array.from({ length: 28 }).map((_, i) => {
