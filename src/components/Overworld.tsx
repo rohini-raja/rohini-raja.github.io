@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useTheme } from "../lib/ThemeContext";
 import Character from "./Character"; // spaceship
 import StarField from "./StarField";
+import Cockpit from "./Cockpit";
 import Library from "./buildings/Library";
 import Lab from "./buildings/Lab";
 import Academy from "./buildings/Academy";
@@ -84,15 +85,16 @@ const PLANET: Record<BuildingId, PlanetCfg> = {
   cinema:    { r:96,  atmoColor:"#ff6b9d", orbitR:44, orbitRy:16, orbitPeriod:15, orbitPhase:0.30 },
 };
 
-// Pre-generate one CSS @keyframes block per planet (module-level, no JS per frame)
-const ORBIT_KEYFRAMES = Object.entries(PLANET).map(([id, p]) => `
-@keyframes orbit-${id} {
-  0%   { transform: translate(${p.orbitR}px, 0px); }
-  25%  { transform: translate(0px, ${p.orbitRy}px); }
-  50%  { transform: translate(-${p.orbitR}px, 0px); }
-  75%  { transform: translate(0px, -${p.orbitRy}px); }
-  100% { transform: translate(${p.orbitR}px, 0px); }
-}`).join("\n");
+// Smooth 36-step elliptical orbit keyframes (cos/sin so the path is a real ellipse)
+const ORBIT_KEYFRAMES = Object.entries(PLANET).map(([id, p]) => {
+  const steps = Array.from({ length: 37 }, (_, i) => {
+    const a = (i / 36) * Math.PI * 2;
+    const x = (p.orbitR  * Math.cos(a)).toFixed(2);
+    const y = (p.orbitRy * Math.sin(a)).toFixed(2);
+    return `  ${((i / 36) * 100).toFixed(2)}% { transform: translate(${x}px,${y}px); }`;
+  }).join("\n");
+  return `@keyframes orbit-${id} {\n${steps}\n}`;
+}).join("\n\n");
 
 
 // ─── Collision helpers ───────────────────────────────────────────────────────
@@ -142,16 +144,6 @@ function Planet({ b, isNear, onClick, imgSrc }: {
 
   return (
     <Fragment>
-      {/* Faint orbit trail ellipse */}
-      <div style={{
-        position:"absolute",
-        left: cx - orbitR, top: cy - orbitRy,
-        width: orbitR*2, height: orbitRy*2,
-        borderRadius:"50%",
-        border:`1px solid ${atmoColor}18`,
-        pointerEvents:"none", zIndex:1,
-      }} />
-
       {/* Orbiting group — single CSS animation, no JS per frame */}
       <div style={{
         position:"absolute",
@@ -226,6 +218,9 @@ export default function Overworld() {
   const [moving, setMoving]       = useState(false);
   const [activeBuilding, setActiveBuilding] = useState<BuildingId | null>(null);
   const [nearBy, setNearBy]       = useState<BuildingId | null>(null);
+  const [cockpitOpen, setCockpitOpen] = useState(false);
+  // Velocity refs for smooth momentum-based movement
+  const velRef = useRef({ vx:0, vy:0 });
 
   // NASA data
   const [epicUrl, setEpicUrl]       = useState<string | null>(null);
@@ -287,25 +282,41 @@ export default function Overworld() {
     if (epicUrl) setPlanetImgs(prev => ({ ...prev, lab: epicUrl }));
   }, [epicUrl]);
 
-  // ── Game loop ─────────────────────────────────────────────────────────────
+  // ── Game loop — velocity + friction for smooth gliding movement ──────────
+  const ACCEL   = 520;
+  const FRICTION = 0.82;
+  const MAX_SPD  = 160;
+
   const gameLoop = useCallback((now: number) => {
     if (!lastRef.current) lastRef.current = now;
-    const dt   = Math.min((now - lastRef.current) / 1000, 0.1);
+    const dt = Math.min((now - lastRef.current) / 1000, 0.05);
     lastRef.current = now;
     const keys = keysRef.current;
-    let dx = 0, dy = 0;
-    if (keys.has("ArrowLeft")  || keys.has("a") || keys.has("A")) { dx -= 1; setFacing("left");  }
-    if (keys.has("ArrowRight") || keys.has("d") || keys.has("D")) { dx += 1; setFacing("right"); }
-    if (keys.has("ArrowUp")    || keys.has("w") || keys.has("W")) { dy -= 1; setFacing("up");    }
-    if (keys.has("ArrowDown")  || keys.has("s") || keys.has("S")) { dy += 1; setFacing("down");  }
-    const isMoving = dx !== 0 || dy !== 0;
+    let ix = 0, iy = 0;
+    if (keys.has("ArrowLeft")  || keys.has("a") || keys.has("A")) { ix -= 1; setFacing("left");  }
+    if (keys.has("ArrowRight") || keys.has("d") || keys.has("D")) { ix += 1; setFacing("right"); }
+    if (keys.has("ArrowUp")    || keys.has("w") || keys.has("W")) { iy -= 1; setFacing("up");    }
+    if (keys.has("ArrowDown")  || keys.has("s") || keys.has("S")) { iy += 1; setFacing("down");  }
+
+    const len = Math.hypot(ix, iy);
+    if (len > 0) { ix /= len; iy /= len; }
+
+    const vel = velRef.current;
+    vel.vx = (vel.vx + ix * ACCEL * dt) * FRICTION;
+    vel.vy = (vel.vy + iy * ACCEL * dt) * FRICTION;
+    // Cap speed
+    const spd = Math.hypot(vel.vx, vel.vy);
+    if (spd > MAX_SPD) { vel.vx = vel.vx/spd*MAX_SPD; vel.vy = vel.vy/spd*MAX_SPD; }
+
+    const isMoving = spd > 2;
     setMoving(isMoving);
-    if (isMoving) {
-      const len = Math.hypot(dx,dy); dx/=len; dy/=len;
+
+    if (spd > 0.5) {
       setPos(prev => {
-        const nx = prev.x + dx*SPEED*dt, ny = prev.y + dy*SPEED*dt;
-        const newX = isSolid(nx, prev.y) ? prev.x : nx;
-        const newY = isSolid(prev.x, ny) ? prev.y : ny;
+        const nx = prev.x + vel.vx * dt;
+        const ny = prev.y + vel.vy * dt;
+        const newX = isSolid(nx, prev.y) ? (vel.vx = 0, prev.x) : nx;
+        const newY = isSolid(prev.x, ny) ? (vel.vy = 0, prev.y) : ny;
         setNearBy(nearBuilding(newX, newY));
         return { x:newX, y:newY };
       });
@@ -327,7 +338,8 @@ export default function Overworld() {
         const nb = nearBuilding(pos.x, pos.y);
         if (nb) setActiveBuilding(nb);
       }
-      if (e.key === "Escape") setActiveBuilding(null);
+      if (e.key === "Escape") { setActiveBuilding(null); setCockpitOpen(false); }
+      if (e.key === "e" || e.key === "E") setCockpitOpen(o => !o);
       konamiRef.current.push(e.key);
       konamiRef.current = konamiRef.current.slice(-10);
       if (konamiRef.current.join(",") === KONAMI.join(",")) {
@@ -423,10 +435,10 @@ export default function Overworld() {
 
       {/* ── HUD ── */}
       <div className="fixed top-5 left-5" style={{
-        background:"rgba(0,0,0,0.60)",
-        backdropFilter:"blur(14px)",
-        WebkitBackdropFilter:"blur(14px)",
-        border:"1px solid rgba(255,255,255,0.12)",
+        background:"rgba(4,8,20,0.88)",
+        backdropFilter:"blur(16px)",
+        WebkitBackdropFilter:"blur(16px)",
+        border:"1px solid rgba(255,255,255,0.14)",
         borderRadius:14, padding:"12px 20px",
         zIndex:40, maxWidth:260,
       }}>
@@ -567,6 +579,29 @@ export default function Overworld() {
           const Comp = BUILDING_COMPONENTS[activeBuilding];
           return <Comp key={activeBuilding} onClose={() => setActiveBuilding(null)} />;
         })()}
+      </AnimatePresence>
+
+      {/* Cockpit button */}
+      <motion.button
+        onClick={() => setCockpitOpen(true)}
+        whileHover={{ scale:1.05 }} whileTap={{ scale:0.97 }}
+        style={{
+          position:"fixed", bottom:24, right:24,
+          background:"rgba(0,229,255,0.12)",
+          backdropFilter:"blur(12px)",
+          border:"1px solid rgba(0,229,255,0.4)",
+          color:"#00e5ff", fontFamily:"monospace",
+          fontSize:10, letterSpacing:"0.12em",
+          padding:"9px 18px", cursor:"pointer",
+          zIndex:40, borderRadius:4,
+        }}
+      >
+        ◈ COCKPIT  [E]
+      </motion.button>
+
+      {/* Cockpit overlay */}
+      <AnimatePresence>
+        {cockpitOpen && <Cockpit key="cockpit" onClose={() => setCockpitOpen(false)} />}
       </AnimatePresence>
     </div>
   );

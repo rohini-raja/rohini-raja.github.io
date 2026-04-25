@@ -274,7 +274,7 @@ export default function StarField() {
         nextShooter = t + 130 + Math.random() * 280;
       }
 
-      galaxyAngle += 0.000065; // ~1 full rotation per ~27 mins — like real galaxies
+      galaxyAngle += 0.00022; // visibly slow drift
       t++;
       raf = requestAnimationFrame(draw);
     }
