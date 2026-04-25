@@ -695,21 +695,28 @@ export default function Overworld() {
               textAlign:"center",
             }}
           >
-            <p style={{ fontFamily:"monospace", fontSize:11, color:"rgba(255,255,255,0.9)", margin:"0 0 6px", letterSpacing:"0.06em" }}>
-              🚀 &nbsp;YOU ARE THE SPACESHIP
+            <p style={{ fontFamily:"monospace", fontSize:13, color:"rgba(255,255,255,0.95)", margin:"0 0 10px", letterSpacing:"0.04em", fontWeight:600 }}>
+              Welcome to my space!
+            </p>
+            <p style={{ fontFamily:"monospace", fontSize:10, color:"rgba(255,255,255,0.6)", margin:"0 0 12px", lineHeight:1.8, maxWidth:320 }}>
+              I have a lot of interests and hobbies, quite a lot actually!<br/>
+              My universe is a little bit chaotic — I struggle to fit in everything,<br/>
+              which seems impossible, but I'm trying!
+            </p>
+            <div style={{ width:"100%", height:1, background:"rgba(255,255,255,0.08)", margin:"0 0 10px" }} />
+            <p style={{ fontFamily:"monospace", fontSize:10, color:"rgba(255,255,255,0.35)", margin:"0 0 4px", lineHeight:1.7 }}>
+              🚀 &nbsp;you are the spaceship
             </p>
             {isTouchDevice
-              ? <p style={{ fontFamily:"monospace", fontSize:10, color:"rgba(255,255,255,0.5)", margin:0, lineHeight:1.7 }}>
-                  Use the D-pad to fly &nbsp;·&nbsp; tap <b style={{color:"#fff"}}>A</b> near a planet to enter<br/>
-                  tap <b style={{color:"#fff"}}>STAR MAP</b> to jump anywhere
+              ? <p style={{ fontFamily:"monospace", fontSize:10, color:"rgba(255,255,255,0.35)", margin:0, lineHeight:1.7 }}>
+                  D-pad to fly &nbsp;·&nbsp; tap <b style={{color:"rgba(255,255,255,0.6)"}}>A</b> near a planet to enter &nbsp;·&nbsp; <b style={{color:"rgba(255,255,255,0.6)"}}>STAR MAP</b> to jump
                 </p>
-              : <p style={{ fontFamily:"monospace", fontSize:10, color:"rgba(255,255,255,0.5)", margin:0, lineHeight:1.7 }}>
-                  Arrow keys / WASD to fly &nbsp;·&nbsp; click anywhere to auto-pilot<br/>
-                  Press <b style={{color:"#fff"}}>Enter</b> near a planet to enter &nbsp;·&nbsp; <b style={{color:"#fff"}}>M</b> for star map
+              : <p style={{ fontFamily:"monospace", fontSize:10, color:"rgba(255,255,255,0.35)", margin:0, lineHeight:1.7 }}>
+                  Arrow keys / WASD to fly &nbsp;·&nbsp; click anywhere to auto-pilot &nbsp;·&nbsp; <b style={{color:"rgba(255,255,255,0.6)"}}>Enter</b> near a planet to explore
                 </p>
             }
-            <p style={{ fontFamily:"monospace", fontSize:9, color:"rgba(255,255,255,0.25)", margin:"8px 0 0", letterSpacing:"0.04em" }}>
-              tap to dismiss
+            <p style={{ fontFamily:"monospace", fontSize:9, color:"rgba(255,255,255,0.2)", margin:"10px 0 0", letterSpacing:"0.04em" }}>
+              click to dismiss
             </p>
           </motion.div>
         )}
