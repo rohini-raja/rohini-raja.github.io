@@ -565,37 +565,48 @@ export default function Overworld() {
         {/* Ground — transparent so the galaxy shows through */}
         <div style={{ position:"absolute", inset:0, background:"transparent" }} />
 
-        {/* Central sun — real NASA SDO image */}
+        {/* Central sun — CSS with limb darkening */}
         <div style={{
           position:"absolute",
           left: SUN_CX - 80, top: SUN_CY - 80,
           width: 160, height: 160, borderRadius:"50%",
+          background:`radial-gradient(circle at 50% 50%,
+            #ffffff    0%,
+            #fff9c0   6%,
+            #ffe566  16%,
+            #ffb820  32%,
+            #ff8000  52%,
+            #d94000  70%,
+            #8b1a00  84%,
+            rgba(60,5,0,0) 100%)`,
           boxShadow:`
-            0 0 60px  rgba(255,180,80,0.75),
-            0 0 140px rgba(255,140,50,0.5),
-            0 0 280px rgba(255,110,30,0.3),
-            0 0 480px rgba(255,90,20,0.16)`,
+            0 0 55px  rgba(255,200,80,0.95),
+            0 0 120px rgba(255,150,40,0.7),
+            0 0 240px rgba(255,110,20,0.4),
+            0 0 420px rgba(255,80,10,0.2)`,
           animation:"sun-pulse 6s ease-in-out infinite",
           pointerEvents:"none", zIndex:1,
-          overflow:"hidden",
         }}>
-          <img
-            src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_512_0304.jpg"
-            alt="Sun"
-            style={{
-              width:"140%", height:"140%",
-              position:"absolute", left:"-20%", top:"-20%",
-              display:"block",
-              objectFit:"cover",
-              mixBlendMode:"screen",
-              animation:"sun-corona 240s linear infinite",
-              transformOrigin:"50% 50%",
-            }}
-            onError={(e) => {
-              (e.currentTarget as HTMLImageElement).src =
-                "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_512_HMIIF.jpg";
-            }}
-          />
+          {/* Rotating surface texture */}
+          <div style={{
+            position:"absolute", inset:0, borderRadius:"50%",
+            background:`conic-gradient(from 0deg,
+              rgba(255,140,0,0.22) 0deg,   transparent 18deg,
+              rgba(255,180,0,0.18) 52deg,  transparent 70deg,
+              rgba(255,120,0,0.25) 108deg, transparent 126deg,
+              rgba(255,160,0,0.20) 174deg, transparent 192deg,
+              rgba(255,130,0,0.22) 230deg, transparent 248deg,
+              rgba(255,170,0,0.18) 294deg, transparent 312deg,
+              rgba(255,140,0,0.20) 348deg, transparent 360deg)`,
+            animation:"sun-corona 50s linear infinite",
+            mixBlendMode:"overlay",
+          }} />
+          {/* Bright hot core */}
+          <div style={{
+            position:"absolute", inset:"22%", borderRadius:"50%",
+            background:"radial-gradient(circle, rgba(255,255,255,0.98) 0%, rgba(255,250,200,0.6) 55%, transparent 100%)",
+            filter:"blur(4px)",
+          }} />
         </div>
 
         {/* Distant asteroids (decorative — scattered, not obstacles) */}
