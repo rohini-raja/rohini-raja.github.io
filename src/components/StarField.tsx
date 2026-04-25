@@ -32,16 +32,40 @@ export default function StarField({ camRef }: Props = {}) {
     let nextShooter = 180;
     let shooters: Shooter[] = [];
     let particles: Particle[] = [];
+    let dpr = 1;
+
+    // Pre-rendered soft star sprite (Gaussian glow) — drawn once, blitted per star.
+    // Eliminates per-star radialGradient cost and gives subpixel-soft edges.
+    const STAR_SPRITE_R = 32;
+    const starSprite = document.createElement("canvas");
+    starSprite.width = starSprite.height = STAR_SPRITE_R * 2;
+    {
+      const sctx = starSprite.getContext("2d")!;
+      const g = sctx.createRadialGradient(STAR_SPRITE_R, STAR_SPRITE_R, 0, STAR_SPRITE_R, STAR_SPRITE_R, STAR_SPRITE_R);
+      g.addColorStop(0,    "rgba(255,255,255,1)");
+      g.addColorStop(0.18, "rgba(255,255,255,0.55)");
+      g.addColorStop(0.4,  "rgba(255,255,255,0.18)");
+      g.addColorStop(0.75, "rgba(255,255,255,0.04)");
+      g.addColorStop(1,    "rgba(255,255,255,0)");
+      sctx.fillStyle = g;
+      sctx.fillRect(0, 0, STAR_SPRITE_R * 2, STAR_SPRITE_R * 2);
+    }
 
     function resize() {
-      canvas!.width  = window.innerWidth;
-      canvas!.height = window.innerHeight;
+      dpr = Math.min(window.devicePixelRatio || 1, 2.5);
+      const w = window.innerWidth, h = window.innerHeight;
+      canvas!.width  = Math.floor(w * dpr);
+      canvas!.height = Math.floor(h * dpr);
+      canvas!.style.width  = w + "px";
+      canvas!.style.height = h + "px";
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
 
     // ─── Build galaxy particle system ────────────────────────────────────────
     function build() {
       particles = [];
-      const R = Math.min(canvas!.width, canvas!.height) * 0.44;
+      const w = window.innerWidth, h = window.innerHeight;
+      const R = Math.min(w, h) * 0.44;
 
       const push = (
         x: number, y: number, r: number, a: number,
@@ -117,8 +141,8 @@ export default function StarField({ camRef }: Props = {}) {
       // ── Distant background stars/galaxies (screen-space, not rotated) ──────
       for (let i = 0; i < 400; i++) {
         push(
-          (Math.random() - 0.5) * canvas!.width * 1.6,
-          (Math.random() - 0.5) * canvas!.height * 1.6,
+          (Math.random() - 0.5) * w * 1.6,
+          (Math.random() - 0.5) * h * 1.6,
           0.4 + Math.random() * 1.2,
           0.1 + Math.random() * 0.45,
           190 + Math.floor(Math.random() * 40),
@@ -145,7 +169,7 @@ export default function StarField({ camRef }: Props = {}) {
 
     // ─── Draw loop ────────────────────────────────────────────────────────────
     function draw() {
-      const w = canvas!.width, h = canvas!.height;
+      const w = window.innerWidth, h = window.innerHeight;
       // Parallax: galaxy drifts at 8% of camera movement, making it feel infinitely far
       const cam = camRef?.current ?? { x: 0, y: 0 };
       const cx = w * 0.5 - cam.x * 0.08;
@@ -205,17 +229,13 @@ export default function StarField({ camRef }: Props = {}) {
         const a  = Math.max(0.02, p.alpha + tw * 0.14);
         const r  = Math.max(0.25, p.r * (0.88 + tw * 0.14));
 
-        // Glow for larger stars
-        if (p.r > 1.2) {
-          const glow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r * 5);
-          glow.addColorStop(0, `rgba(${p.cr},${p.cg},${p.cb},${(a * 0.35).toFixed(3)})`);
-          glow.addColorStop(1, "rgba(0,0,0,0)");
-          ctx.fillStyle = glow;
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, r * 5, 0, Math.PI * 2);
-          ctx.fill();
-        }
+        // Soft glow via cached Gaussian sprite (smooth at any DPI, no per-frame gradient cost)
+        const glowR = Math.max(2, r * 5);
+        ctx.globalAlpha = Math.min(1, a * 0.55);
+        ctx.drawImage(starSprite, p.x - glowR, p.y - glowR, glowR * 2, glowR * 2);
+        ctx.globalAlpha = 1;
 
+        // Colored core
         ctx.fillStyle = `rgba(${p.cr},${p.cg},${p.cb},${a.toFixed(3)})`;
         ctx.beginPath();
         ctx.arc(p.x, p.y, r, 0, Math.PI * 2);

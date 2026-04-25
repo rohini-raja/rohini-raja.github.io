@@ -643,6 +643,8 @@ export default function Overworld() {
           cursor:"crosshair",
         }}
         onClick={e => {
+          if ((e.target as HTMLElement).closest('button, a, [role="button"]')) return;
+          if (e.target !== e.currentTarget && !(e.target as HTMLElement).matches('div, span')) return;
           const worldX = e.clientX + camRef.current.x;
           const worldY = e.clientY + camRef.current.y;
           if (!isSolid(worldX - 12, worldY - 12))
