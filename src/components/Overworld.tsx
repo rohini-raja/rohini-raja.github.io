@@ -69,18 +69,30 @@ const FALLBACK_ICONS: Record<BuildingId, string> = {
   cinema:    "🎬",
 };
 
-// ─── Planet configs — only glow colour and size, no CSS drawings ─────────────
-const PLANET: Record<BuildingId, { r: number; atmoColor: string }> = {
-  library:   { r:88,  atmoColor:"#c77dff" },
-  lab:       { r:84,  atmoColor:"#48cae4" },
-  academy:   { r:108, atmoColor:"#f4a261" },
-  shrine:    { r:80,  atmoColor:"#e63946" },
-  arcade:    { r:86,  atmoColor:"#00f5ff" },
-  skygazing: { r:90,  atmoColor:"#90e0ef" },
-  travel:    { r:84,  atmoColor:"#52b788" },
-  writing:   { r:82,  atmoColor:"#ffd60a" },
-  cinema:    { r:96,  atmoColor:"#ff6b9d" },
+// ─── Planet configs — size, glow, and orbital params ─────────────────────────
+interface PlanetCfg { r:number; atmoColor:string; orbitR:number; orbitRy:number; orbitPeriod:number; orbitPhase:number }
+const PLANET: Record<BuildingId, PlanetCfg> = {
+  //                  r    atmo        orbitR  orbitRy  period  phase
+  library:   { r:88,  atmoColor:"#c77dff", orbitR:38, orbitRy:14, orbitPeriod:13, orbitPhase:0.00 },
+  lab:       { r:84,  atmoColor:"#48cae4", orbitR:30, orbitRy:11, orbitPeriod:9,  orbitPhase:0.28 },
+  academy:   { r:108, atmoColor:"#f4a261", orbitR:48, orbitRy:17, orbitPeriod:17, orbitPhase:0.55 },
+  shrine:    { r:80,  atmoColor:"#e63946", orbitR:32, orbitRy:12, orbitPeriod:10, orbitPhase:0.40 },
+  arcade:    { r:86,  atmoColor:"#00f5ff", orbitR:34, orbitRy:13, orbitPeriod:11, orbitPhase:0.75 },
+  skygazing: { r:90,  atmoColor:"#90e0ef", orbitR:40, orbitRy:15, orbitPeriod:14, orbitPhase:0.15 },
+  travel:    { r:84,  atmoColor:"#52b788", orbitR:30, orbitRy:11, orbitPeriod:12, orbitPhase:0.65 },
+  writing:   { r:82,  atmoColor:"#ffd60a", orbitR:28, orbitRy:10, orbitPeriod:8,  orbitPhase:0.50 },
+  cinema:    { r:96,  atmoColor:"#ff6b9d", orbitR:44, orbitRy:16, orbitPeriod:15, orbitPhase:0.30 },
 };
+
+// Pre-generate one CSS @keyframes block per planet (module-level, no JS per frame)
+const ORBIT_KEYFRAMES = Object.entries(PLANET).map(([id, p]) => `
+@keyframes orbit-${id} {
+  0%   { transform: translate(${p.orbitR}px, 0px); }
+  25%  { transform: translate(0px, ${p.orbitRy}px); }
+  50%  { transform: translate(-${p.orbitR}px, 0px); }
+  75%  { transform: translate(0px, -${p.orbitRy}px); }
+  100% { transform: translate(${p.orbitR}px, 0px); }
+}`).join("\n");
 
 
 // ─── Collision helpers ───────────────────────────────────────────────────────
@@ -119,70 +131,88 @@ const BUILDING_COMPONENTS: Record<BuildingId, React.ComponentType<{ onClose: ()=
   skygazing:Skygazing, travel:Travel, writing:Writing, cinema:Cinema,
 };
 
-// ─── Planet renderer — real NASA photo, nothing drawn ────────────────────────
+// ─── Planet renderer — orbiting wrapper + NASA photo ─────────────────────────
 function Planet({ b, isNear, onClick, imgSrc }: {
   b: Building; isNear: boolean; onClick: ()=>void; imgSrc?: string | null;
 }) {
-  const { r, atmoColor } = PLANET[b.id];
+  const { r, atmoColor, orbitR, orbitRy, orbitPeriod, orbitPhase } = PLANET[b.id];
+  // Anchor = static centre of the building tile
   const cx = b.x*TILE + (b.w*TILE)/2;
   const cy = b.y*TILE + (b.h*TILE)/2;
 
   return (
     <Fragment>
-      {/* Glow — real atmospheric light, not a drawing */}
+      {/* Faint orbit trail ellipse */}
       <div style={{
         position:"absolute",
-        left:cx - r*1.6, top:cy - r*1.6,
-        width:r*3.2, height:r*3.2,
+        left: cx - orbitR, top: cy - orbitRy,
+        width: orbitR*2, height: orbitRy*2,
         borderRadius:"50%",
-        background:`radial-gradient(circle, ${atmoColor}22 0%, ${atmoColor}08 50%, transparent 72%)`,
-        filter:"blur(8px)",
+        border:`1px solid ${atmoColor}18`,
         pointerEvents:"none", zIndex:1,
-        opacity: isNear ? 1 : 0.6,
-        transition:"opacity 0.3s",
       }} />
 
-      {/* Planet — NASA photo only */}
-      <div onClick={onClick} style={{
-        position:"absolute",
-        left:cx-r, top:cy-r,
-        width:r*2, height:r*2,
-        borderRadius:"50%",
-        overflow:"hidden",
-        cursor:"pointer",
-        zIndex:3,
-        boxShadow: isNear
-          ? `0 0 0 2px ${atmoColor}, 0 0 40px ${atmoColor}80`
-          : `0 0 0 1px ${atmoColor}40`,
-        transition:"box-shadow 0.3s",
-        background:"#000",
-      }}>
-        {imgSrc
-          ? <img src={imgSrc} alt={b.planetLabel}
-              style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
-          : <div style={{
-              width:"100%", height:"100%",
-              display:"flex", alignItems:"center", justifyContent:"center",
-              fontSize:r*0.65, userSelect:"none",
-              background:"#050510",
-            }}>{FALLBACK_ICONS[b.id]}</div>
-        }
-      </div>
-
-      {/* Label */}
+      {/* Orbiting group — single CSS animation, no JS per frame */}
       <div style={{
         position:"absolute",
-        left:cx-r*1.4, top:cy+r+10,
-        width:r*2.8, textAlign:"center",
-        fontFamily:'"Inter","Share Tech Mono",monospace',
-        fontSize:10, fontWeight:500, letterSpacing:"0.08em",
-        color: isNear ? "#fff" : "rgba(255,255,255,0.5)",
-        textShadow: isNear ? `0 0 16px ${atmoColor}` : "none",
-        pointerEvents:"none", whiteSpace:"nowrap",
-        transition:"color 0.3s",
-        zIndex:6,
+        left: cx, top: cy,
+        animation: `orbit-${b.id} ${orbitPeriod}s linear infinite`,
+        animationDelay: `-${(orbitPhase * orbitPeriod).toFixed(2)}s`,
+        zIndex:2,
       }}>
-        {b.emoji}  {b.planetLabel}
+        {/* Glow */}
+        <div style={{
+          position:"absolute",
+          left:-r*1.6, top:-r*1.6,
+          width:r*3.2, height:r*3.2,
+          borderRadius:"50%",
+          background:`radial-gradient(circle, ${atmoColor}22 0%, ${atmoColor}08 50%, transparent 72%)`,
+          filter:"blur(8px)",
+          pointerEvents:"none",
+          opacity: isNear ? 1 : 0.6,
+          transition:"opacity 0.3s",
+        }} />
+
+        {/* Planet */}
+        <div onClick={onClick} style={{
+          position:"absolute",
+          left:-r, top:-r,
+          width:r*2, height:r*2,
+          borderRadius:"50%",
+          overflow:"hidden",
+          cursor:"pointer",
+          boxShadow: isNear
+            ? `0 0 0 2px ${atmoColor}, 0 0 40px ${atmoColor}80`
+            : `0 0 0 1px ${atmoColor}40`,
+          transition:"box-shadow 0.3s",
+          background:"#000",
+        }}>
+          {imgSrc
+            ? <img src={imgSrc} alt={b.planetLabel}
+                style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
+            : <div style={{
+                width:"100%", height:"100%",
+                display:"flex", alignItems:"center", justifyContent:"center",
+                fontSize:r*0.65, userSelect:"none",
+                background:"#050510",
+              }}>{FALLBACK_ICONS[b.id]}</div>
+          }
+        </div>
+
+        {/* Label */}
+        <div style={{
+          position:"absolute",
+          left:-r*1.4, top:r+10,
+          width:r*2.8, textAlign:"center",
+          fontFamily:'"Inter","Share Tech Mono",monospace',
+          fontSize:10, fontWeight:500, letterSpacing:"0.08em",
+          color: isNear ? "#fff" : "rgba(255,255,255,0.5)",
+          textShadow: isNear ? `0 0 16px ${atmoColor}` : "none",
+          pointerEvents:"none", whiteSpace:"nowrap",
+          transition:"color 0.3s",
+        }}>
+          {b.emoji}  {b.planetLabel}
+        </div>
       </div>
     </Fragment>
   );
@@ -339,6 +369,9 @@ export default function Overworld() {
       style={{ background:"transparent", cursor:"default", touchAction:"none" }}
       tabIndex={0}
     >
+      {/* ── Planet orbit keyframes (one per planet, generated at module level) ── */}
+      <style>{ORBIT_KEYFRAMES}</style>
+
       {/* ── Animated starfield background ── */}
       <StarField />
 
