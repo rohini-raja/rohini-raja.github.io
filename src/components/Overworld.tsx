@@ -583,8 +583,11 @@ export default function Overworld() {
             src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_512_0304.jpg"
             alt="Sun"
             style={{
-              width:"100%", height:"100%", display:"block",
+              width:"140%", height:"140%",
+              position:"absolute", left:"-20%", top:"-20%",
+              display:"block",
               objectFit:"cover",
+              mixBlendMode:"screen",
               animation:"sun-corona 240s linear infinite",
               transformOrigin:"50% 50%",
             }}
