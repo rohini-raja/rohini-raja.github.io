@@ -565,40 +565,34 @@ export default function Overworld() {
         {/* Ground — transparent so the galaxy shows through */}
         <div style={{ position:"absolute", inset:0, background:"transparent" }} />
 
-        {/* Central sun (the system's star) */}
+        {/* Central sun — real NASA SDO image */}
         <div style={{
           position:"absolute",
-          left: SUN_CX - 70, top: SUN_CY - 70,
-          width: 140, height: 140, borderRadius:"50%",
-          background:`radial-gradient(circle at 50% 50%,
-            #ffffff 0%, #fff5c8 15%, #ffd166 35%, #ff8c2a 65%, rgba(255,80,0,0) 100%)`,
+          left: SUN_CX - 80, top: SUN_CY - 80,
+          width: 160, height: 160, borderRadius:"50%",
           boxShadow:`
-            0 0 60px  rgba(255,210,100,0.85),
-            0 0 140px rgba(255,170,60,0.55),
-            0 0 280px rgba(255,140,40,0.32),
-            0 0 480px rgba(255,120,30,0.18)`,
-          animation:"sun-pulse 5s ease-in-out infinite",
+            0 0 60px  rgba(255,180,80,0.75),
+            0 0 140px rgba(255,140,50,0.5),
+            0 0 280px rgba(255,110,30,0.3),
+            0 0 480px rgba(255,90,20,0.16)`,
+          animation:"sun-pulse 6s ease-in-out infinite",
           pointerEvents:"none", zIndex:1,
+          overflow:"hidden",
         }}>
-          {/* Spinning corona rays */}
-          <div style={{
-            position:"absolute", inset:-40, borderRadius:"50%",
-            background:`conic-gradient(from 0deg,
-              rgba(255,200,80,0) 0deg, rgba(255,200,80,0.18) 8deg, rgba(255,200,80,0) 18deg,
-              rgba(255,200,80,0) 60deg, rgba(255,200,80,0.14) 68deg, rgba(255,200,80,0) 78deg,
-              rgba(255,200,80,0) 130deg, rgba(255,200,80,0.16) 138deg, rgba(255,200,80,0) 148deg,
-              rgba(255,200,80,0) 200deg, rgba(255,200,80,0.13) 208deg, rgba(255,200,80,0) 218deg,
-              rgba(255,200,80,0) 270deg, rgba(255,200,80,0.17) 278deg, rgba(255,200,80,0) 288deg,
-              rgba(255,200,80,0) 330deg, rgba(255,200,80,0.12) 338deg, rgba(255,200,80,0) 348deg)`,
-            animation:"sun-corona 90s linear infinite",
-            mixBlendMode:"screen",
-          }} />
-          {/* Inner bright core */}
-          <div style={{
-            position:"absolute", inset:"30%", borderRadius:"50%",
-            background:"radial-gradient(circle, #ffffff 0%, #fff8d4 60%, transparent 100%)",
-            filter:"blur(2px)",
-          }} />
+          <img
+            src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_512_0304.jpg"
+            alt="Sun"
+            style={{
+              width:"100%", height:"100%", display:"block",
+              objectFit:"cover",
+              animation:"sun-corona 240s linear infinite",
+              transformOrigin:"50% 50%",
+            }}
+            onError={(e) => {
+              (e.currentTarget as HTMLImageElement).src =
+                "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_512_HMIIF.jpg";
+            }}
+          />
         </div>
 
         {/* Distant asteroids (decorative — scattered, not obstacles) */}
@@ -643,25 +637,10 @@ export default function Overworld() {
         backdropFilter:"blur(16px)",
         WebkitBackdropFilter:"blur(16px)",
         border:"1px solid rgba(255,255,255,0.14)",
-        borderRadius:14, padding:"12px 20px",
-        zIndex:40, maxWidth:260,
+        borderRadius:14, padding:"10px 18px",
+        zIndex:40,
       }}>
         <p style={{ fontSize:13, fontWeight:700, letterSpacing:"0.07em", color:"#fff", margin:0 }}>ROHINI RAJASIMMAN</p>
-        <p style={{ fontSize:10, color:"rgba(255,255,255,0.45)", margin:"3px 0 8px", letterSpacing:"0.05em" }}>builder · reader · explorer</p>
-        <div style={{ width:"100%", height:1, background:"rgba(255,255,255,0.08)", marginBottom:8 }} />
-        <p style={{ fontSize:10, color:"rgba(255,255,255,0.7)", margin:0, lineHeight:1.65, letterSpacing:"0.02em" }}>
-          Software engineer passionate about building products that sit at the intersection of technology and human experience.
-          Loves space, stories, and shipping things that matter.
-        </p>
-        <div style={{ marginTop:8, display:"flex", gap:6, flexWrap:"wrap" }}>
-          {["Software Eng","Space Nerd","Avid Reader","Cinephile"].map(tag => (
-            <span key={tag} style={{
-              fontSize:8, padding:"2px 7px", borderRadius:20,
-              border:"1px solid rgba(255,255,255,0.15)",
-              color:"rgba(255,255,255,0.5)", letterSpacing:"0.04em",
-            }}>{tag}</span>
-          ))}
-        </div>
       </div>
 
       {/* Near-planet hint */}
