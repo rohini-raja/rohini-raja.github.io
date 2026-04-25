@@ -136,6 +136,60 @@ const PLANET_DESCRIPTIONS: Record<BuildingId, string> = {
   cinema:    "Films & Cinema",
 };
 
+// ─── Sun canvas — luminance → alpha so black background vanishes ─────────────
+function SunCanvas({ size }: { size: number }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
+    if (!ctx) return;
+
+    const drawFallback = () => {
+      const g = ctx.createRadialGradient(size/2,size/2,0, size/2,size/2,size/2);
+      g.addColorStop(0,    "#ffffff");
+      g.addColorStop(0.06, "#fff9c0");
+      g.addColorStop(0.18, "#ffe566");
+      g.addColorStop(0.36, "#ffb820");
+      g.addColorStop(0.56, "#ff8000");
+      g.addColorStop(0.74, "#d94000");
+      g.addColorStop(0.88, "#8b1a00");
+      g.addColorStop(1,    "rgba(0,0,0,0)");
+      ctx.clearRect(0, 0, size, size);
+      ctx.beginPath();
+      ctx.arc(size/2, size/2, size/2, 0, Math.PI*2);
+      ctx.fillStyle = g;
+      ctx.fill();
+    };
+
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      ctx.clearRect(0, 0, size, size);
+      ctx.drawImage(img, 0, 0, size, size);
+      try {
+        const d = ctx.getImageData(0, 0, size, size);
+        for (let i = 0; i < d.data.length; i += 4) {
+          const lum = d.data[i]*0.299 + d.data[i+1]*0.587 + d.data[i+2]*0.114;
+          d.data[i+3] = Math.min(255, Math.round(lum * 2.8));
+        }
+        ctx.putImageData(d, 0, 0);
+      } catch { drawFallback(); }
+    };
+    img.onerror = drawFallback;
+    img.src = "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_512_HMIIF.jpg";
+  }, [size]);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      width={size}
+      height={size}
+      style={{ display:"block", width:size, height:size }}
+    />
+  );
+}
+
 // ─── Planet renderer — orbiting wrapper + NASA photo ─────────────────────────
 function Planet({ b, isNear, onClick, imgSrc }: {
   b: Building; isNear: boolean; onClick: ()=>void; imgSrc?: string | null;
@@ -565,48 +619,21 @@ export default function Overworld() {
         {/* Ground — transparent so the galaxy shows through */}
         <div style={{ position:"absolute", inset:0, background:"transparent" }} />
 
-        {/* Central sun — CSS with limb darkening */}
+        {/* Sun — glow halo + canvas (luminance→alpha removes black bg) */}
         <div style={{
           position:"absolute",
           left: SUN_CX - 80, top: SUN_CY - 80,
           width: 160, height: 160, borderRadius:"50%",
-          background:`radial-gradient(circle at 50% 50%,
-            #ffffff    0%,
-            #fff9c0   6%,
-            #ffe566  16%,
-            #ffb820  32%,
-            #ff8000  52%,
-            #d94000  70%,
-            #8b1a00  84%,
-            rgba(60,5,0,0) 100%)`,
           boxShadow:`
-            0 0 55px  rgba(255,200,80,0.95),
-            0 0 120px rgba(255,150,40,0.7),
-            0 0 240px rgba(255,110,20,0.4),
-            0 0 420px rgba(255,80,10,0.2)`,
+            0 0 55px  rgba(255,210,80,0.95),
+            0 0 120px rgba(255,160,50,0.72),
+            0 0 240px rgba(255,120,20,0.44),
+            0 0 440px rgba(255,90,10,0.2)`,
           animation:"sun-pulse 6s ease-in-out infinite",
           pointerEvents:"none", zIndex:1,
+          overflow:"hidden",
         }}>
-          {/* Rotating surface texture */}
-          <div style={{
-            position:"absolute", inset:0, borderRadius:"50%",
-            background:`conic-gradient(from 0deg,
-              rgba(255,140,0,0.22) 0deg,   transparent 18deg,
-              rgba(255,180,0,0.18) 52deg,  transparent 70deg,
-              rgba(255,120,0,0.25) 108deg, transparent 126deg,
-              rgba(255,160,0,0.20) 174deg, transparent 192deg,
-              rgba(255,130,0,0.22) 230deg, transparent 248deg,
-              rgba(255,170,0,0.18) 294deg, transparent 312deg,
-              rgba(255,140,0,0.20) 348deg, transparent 360deg)`,
-            animation:"sun-corona 50s linear infinite",
-            mixBlendMode:"overlay",
-          }} />
-          {/* Bright hot core */}
-          <div style={{
-            position:"absolute", inset:"22%", borderRadius:"50%",
-            background:"radial-gradient(circle, rgba(255,255,255,0.98) 0%, rgba(255,250,200,0.6) 55%, transparent 100%)",
-            filter:"blur(4px)",
-          }} />
+          <SunCanvas size={160} />
         </div>
 
         {/* Distant asteroids (decorative — scattered, not obstacles) */}
