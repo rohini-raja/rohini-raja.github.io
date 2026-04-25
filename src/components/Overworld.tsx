@@ -144,40 +144,37 @@ function Planet({ b, isNear, onClick, imgSrc }: {
 
   return (
     <Fragment>
-      {/* Orbiting group — single CSS animation, no JS per frame */}
+      {/* Orbiting group */}
       <div style={{
-        position:"absolute",
-        left: cx, top: cy,
+        position:"absolute", left: cx, top: cy,
         animation: `orbit-${b.id} ${orbitPeriod}s linear infinite`,
         animationDelay: `-${(orbitPhase * orbitPeriod).toFixed(2)}s`,
         zIndex:2,
       }}>
-        {/* Glow */}
+        {/* Wide soft atmosphere — no hard edge, bleeds into space */}
         <div style={{
           position:"absolute",
-          left:-r*1.6, top:-r*1.6,
-          width:r*3.2, height:r*3.2,
+          left:-r*2.4, top:-r*2.4,
+          width:r*4.8, height:r*4.8,
           borderRadius:"50%",
-          background:`radial-gradient(circle, ${atmoColor}22 0%, ${atmoColor}08 50%, transparent 72%)`,
-          filter:"blur(8px)",
+          background:`radial-gradient(circle, ${atmoColor}30 0%, ${atmoColor}12 38%, ${atmoColor}04 60%, transparent 76%)`,
+          filter:`blur(${r*0.18}px)`,
           pointerEvents:"none",
-          opacity: isNear ? 1 : 0.6,
-          transition:"opacity 0.3s",
+          opacity: isNear ? 1 : 0.55,
+          transition:"opacity 0.4s",
         }} />
 
-        {/* Planet */}
+        {/* Planet clickable area — clip but NO border, NO background box */}
         <div onClick={onClick} style={{
-          position:"absolute",
-          left:-r, top:-r,
+          position:"absolute", left:-r, top:-r,
           width:r*2, height:r*2,
-          borderRadius:"50%",
-          overflow:"hidden",
+          borderRadius:"50%", overflow:"hidden",
           cursor:"pointer",
-          boxShadow: isNear
-            ? `0 0 0 2px ${atmoColor}, 0 0 40px ${atmoColor}80`
-            : `0 0 0 1px ${atmoColor}40`,
-          transition:"box-shadow 0.3s",
-          background:"#000",
+          // drop-shadow replaces hard box-shadow ring — glow bleeds outward naturally
+          filter: isNear
+            ? `drop-shadow(0 0 ${r*0.3}px ${atmoColor}) drop-shadow(0 0 ${r*0.6}px ${atmoColor}70)`
+            : `drop-shadow(0 0 ${r*0.12}px ${atmoColor}50)`,
+          transition:"filter 0.4s",
         }}>
           {imgSrc
             ? <img src={imgSrc} alt={b.planetLabel}
@@ -186,24 +183,35 @@ function Planet({ b, isNear, onClick, imgSrc }: {
                 width:"100%", height:"100%",
                 display:"flex", alignItems:"center", justifyContent:"center",
                 fontSize:r*0.65, userSelect:"none",
-                background:"#050510",
+                background:`radial-gradient(circle at 38% 35%, ${atmoColor}40, #020510)`,
               }}>{FALLBACK_ICONS[b.id]}</div>
           }
+
+          {/* Limb darkening — dark edge vignette for 3-D depth */}
+          <div style={{
+            position:"absolute", inset:0, borderRadius:"50%", pointerEvents:"none",
+            background:"radial-gradient(circle at 38% 35%, transparent 45%, rgba(0,0,0,0.55) 100%)",
+          }} />
+
+          {/* Thin atmosphere rim */}
+          <div style={{
+            position:"absolute", inset:0, borderRadius:"50%", pointerEvents:"none",
+            boxShadow:`inset 0 0 ${r*0.22}px ${atmoColor}55`,
+          }} />
         </div>
 
         {/* Label */}
         <div style={{
-          position:"absolute",
-          left:-r*1.4, top:r+10,
-          width:r*2.8, textAlign:"center",
-          fontFamily:'"Inter","Share Tech Mono",monospace',
-          fontSize:10, fontWeight:500, letterSpacing:"0.08em",
-          color: isNear ? "#fff" : "rgba(255,255,255,0.5)",
-          textShadow: isNear ? `0 0 16px ${atmoColor}` : "none",
+          position:"absolute", left:-r*1.5, top:r+8,
+          width:r*3, textAlign:"center",
+          fontFamily:'"Share Tech Mono",monospace',
+          fontSize:9, letterSpacing:"0.1em",
+          color: isNear ? "#fff" : "rgba(255,255,255,0.38)",
+          textShadow: isNear ? `0 0 18px ${atmoColor}, 0 0 6px ${atmoColor}` : "none",
           pointerEvents:"none", whiteSpace:"nowrap",
-          transition:"color 0.3s",
+          transition:"color 0.3s, text-shadow 0.3s",
         }}>
-          {b.emoji}  {b.planetLabel}
+          {b.emoji} {b.planetLabel}
         </div>
       </div>
     </Fragment>
