@@ -4,7 +4,6 @@ import { ThemeProvider } from "./lib/ThemeContext";
 import BootScreen from "./components/BootScreen";
 import Overworld from "./components/Overworld";
 import ThemePicker from "./components/ThemePicker";
-import Tamagotchi from "./components/Tamagotchi";
 
 function Game() {
   const [booted, setBooted] = useState(false);
@@ -24,7 +23,7 @@ function Game() {
           >
             <Overworld />
             <ThemePicker />
-            <Tamagotchi />
+
           </motion.div>
         )}
       </AnimatePresence>
