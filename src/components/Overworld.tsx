@@ -728,7 +728,7 @@ export default function Overworld() {
             transition={{ duration:0.4 }}
             onClick={() => setShowControls(false)}
             style={{
-              position:"fixed", bottom: isTouchDevice ? 220 : 24, left:"50%", transform:"translateX(-50%)",
+              position:"fixed", top:"50%", left:"50%", transform:"translate(-50%, -50%)",
               zIndex:50, cursor:"pointer",
               background:"rgba(4,8,24,0.82)",
               backdropFilter:"blur(14px)",
