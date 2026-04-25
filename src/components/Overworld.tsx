@@ -46,6 +46,11 @@ const BUILDINGS: Building[] = [
   { id:"linkedin",  label:"LINKEDIN",    emoji:"💼", planetLabel:"NEXORIA"  },
 ];
 
+// Hardcoded stable image URLs — bypasses NASA API for specific planets
+const PLANET_IMG_HARDCODED: Partial<Record<BuildingId, string>> = {
+  instagram: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Saturn_during_Equinox.jpg/800px-Saturn_during_Equinox.jpg",
+};
+
 // ─── NASA image queries per planet ──────────────────────────────────────────
 const NASA_QUERIES: Record<BuildingId, string> = {
   library:   "hubble deep field galaxy",
@@ -476,6 +481,11 @@ export default function Overworld() {
     (Object.entries(NASA_QUERIES) as [BuildingId, string][]).forEach(([id, query]) => {
       // Lab planet uses EPIC Earth directly – skip Image Library for it
       if (id === "lab") return;
+      // Use hardcoded image if available — skip API call
+      if (PLANET_IMG_HARDCODED[id]) {
+        setPlanetImgs(prev => ({ ...prev, [id]: PLANET_IMG_HARDCODED[id]! }));
+        return;
+      }
       fetch(`https://images-api.nasa.gov/search?q=${encodeURIComponent(query)}&media_type=image&page_size=5`)
         .then(r => r.json())
         .then((data: { collection:{ items:Array<{ links?:Array<{ href:string }> }> } }) => {
