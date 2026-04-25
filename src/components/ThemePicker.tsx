@@ -11,14 +11,32 @@ export default function ThemePicker() {
     <div className="fixed top-4 right-4 z-50">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="w-10 h-10 rounded-none font-pixel text-lg flex items-center justify-center transition-transform hover:scale-110"
-        style={{
-          background: theme.panel,
-          border: `2px solid ${theme.accent}`,
-          boxShadow: `0 0 12px ${theme.accent}40`,
-          color: theme.text,
-        }}
         title="Change theme"
+        style={{
+          width: 34, height: 34,
+          borderRadius: 8,
+          background: "rgba(255,255,255,0.06)",
+          backdropFilter: "blur(12px)",
+          WebkitBackdropFilter: "blur(12px)",
+          border: "1px solid rgba(255,255,255,0.12)",
+          color: "rgba(255,255,255,0.55)",
+          fontSize: 14,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          cursor: "pointer",
+          transition: "background 0.2s, border-color 0.2s, color 0.2s",
+        }}
+        onMouseEnter={e => {
+          const el = e.currentTarget as HTMLButtonElement;
+          el.style.background = "rgba(255,255,255,0.11)";
+          el.style.borderColor = "rgba(255,255,255,0.22)";
+          el.style.color = "rgba(255,255,255,0.85)";
+        }}
+        onMouseLeave={e => {
+          const el = e.currentTarget as HTMLButtonElement;
+          el.style.background = "rgba(255,255,255,0.06)";
+          el.style.borderColor = "rgba(255,255,255,0.12)";
+          el.style.color = "rgba(255,255,255,0.55)";
+        }}
       >
         🎨
       </button>
@@ -26,35 +44,57 @@ export default function ThemePicker() {
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ opacity: 0, y: -10, scale: 0.95 }}
+            initial={{ opacity: 0, y: -6, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -10, scale: 0.95 }}
-            className="absolute top-12 right-0 p-3 w-52"
+            exit={{ opacity: 0, y: -6, scale: 0.97 }}
+            transition={{ duration: 0.15 }}
             style={{
-              background: theme.panel,
-              border: `2px solid ${theme.panelBorder}`,
-              backdropFilter: "blur(12px)",
+              position: "absolute", top: 42, right: 0,
+              width: 180, padding: "10px 8px",
+              background: "rgba(6,8,20,0.88)",
+              backdropFilter: "blur(18px)",
+              WebkitBackdropFilter: "blur(18px)",
+              border: "1px solid rgba(255,255,255,0.1)",
+              borderRadius: 10,
+              boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
             }}
           >
-            <p className="font-pixel text-xs mb-3 opacity-70" style={{ color: theme.text }}>
-              PALETTE
+            <p style={{ fontFamily: "monospace", fontSize: 8, color: "rgba(255,255,255,0.3)",
+              letterSpacing: "0.2em", marginBottom: 8, paddingLeft: 6 }}>
+              THEME
             </p>
-            <div className="space-y-1">
+            <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
               {THEMES.map((t) => (
                 <button
                   key={t.id}
                   onClick={() => { setTheme(t); setOpen(false); }}
-                  className="w-full flex items-center gap-2 px-2 py-1.5 text-left transition-all"
                   style={{
-                    background: t.id === theme.id ? `${t.accent}20` : "transparent",
-                    border: t.id === theme.id ? `1px solid ${t.accent}` : "1px solid transparent",
-                    color: theme.text,
+                    width: "100%", display: "flex", alignItems: "center", gap: 8,
+                    padding: "6px 8px", textAlign: "left",
+                    borderRadius: 6, cursor: "pointer",
+                    background: t.id === theme.id ? `${t.accent}18` : "transparent",
+                    border: t.id === theme.id ? `1px solid ${t.accent}50` : "1px solid transparent",
+                    color: t.id === theme.id ? "#fff" : "rgba(255,255,255,0.5)",
+                    fontFamily: "monospace", fontSize: 11,
+                    transition: "background 0.15s, color 0.15s",
+                  }}
+                  onMouseEnter={e => {
+                    if (t.id !== theme.id) {
+                      (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.06)";
+                      (e.currentTarget as HTMLButtonElement).style.color = "rgba(255,255,255,0.8)";
+                    }
+                  }}
+                  onMouseLeave={e => {
+                    if (t.id !== theme.id) {
+                      (e.currentTarget as HTMLButtonElement).style.background = "transparent";
+                      (e.currentTarget as HTMLButtonElement).style.color = "rgba(255,255,255,0.5)";
+                    }
                   }}
                 >
-                  <span>{t.emoji}</span>
-                  <span className="font-mono text-xs">{t.name}</span>
+                  <span style={{ fontSize: 13 }}>{t.emoji}</span>
+                  <span>{t.name}</span>
                   {t.id === theme.id && (
-                    <span className="ml-auto text-xs" style={{ color: t.accent }}>✓</span>
+                    <span style={{ marginLeft: "auto", fontSize: 10, color: t.accent }}>✓</span>
                   )}
                 </button>
               ))}
