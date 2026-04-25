@@ -38,7 +38,7 @@ export default function LinkedIn({ onClose }: Props) {
             }}>in</div>
             <div>
               <p style={{ fontFamily: "monospace", fontSize: 13, color: "#fff", margin: 0, fontWeight: 700, letterSpacing: "0.04em" }}>
-                Rohini Raja
+                Rohini Rajasimman
               </p>
               <p style={{ fontFamily: "monospace", fontSize: 9, color: "rgba(255,255,255,0.7)", margin: 0 }}>
                 LinkedIn Profile
@@ -64,7 +64,7 @@ export default function LinkedIn({ onClose }: Props) {
               boxShadow: `0 0 24px ${COLOR}50`,
             }}>👩‍💻</div>
             <p style={{ fontFamily: "monospace", fontSize: 14, color: theme.text, margin: "0 0 4px", fontWeight: 700 }}>
-              Rohini Rajasimman
+              Rohini Rajasimmansimman
             </p>
             <p style={{ fontFamily: "monospace", fontSize: 10, color: "rgba(255,255,255,0.4)", margin: 0, lineHeight: 1.6 }}>
               Engineer
