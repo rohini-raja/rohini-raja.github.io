@@ -21,28 +21,25 @@ interface Building {
   id: BuildingId;
   label: string;
   emoji: string;
-  x: number; y: number; w: number; h: number;
-  color: string; roofColor: string;
   planetLabel: string;
 }
 
 const TILE  = 32;
-const MAP_W = 30;
-const MAP_H = 30;
+const MAP_W = 50;
+const MAP_H = 50;
+const SUN_CX = (MAP_W * TILE) / 2;
+const SUN_CY = (MAP_H * TILE) / 2;
 
 const BUILDINGS: Building[] = [
-  // Row 1
-  { id:"library",   label:"LIBRARY",     emoji:"📚", x:3,  y:3,  w:4, h:4, color:"#5c3d1e", roofColor:"#8b2e2e", planetLabel:"LIBRARIA" },
-  { id:"lab",       label:"LAB",         emoji:"🔬", x:11, y:3,  w:4, h:4, color:"#1a3a5c", roofColor:"#0a5a8a", planetLabel:"LABRON"   },
-  { id:"academy",   label:"ACADEMY",     emoji:"🎓", x:19, y:3,  w:5, h:4, color:"#2d1a5c", roofColor:"#6a2a9a", planetLabel:"ACADEM"   },
-  // Row 2
-  { id:"shrine",    label:"SHRINE",      emoji:"⛩️", x:4,  y:13, w:4, h:4, color:"#5c1a1a", roofColor:"#c04040", planetLabel:"SHRINIA"  },
-  { id:"arcade",    label:"ARCADE",      emoji:"🕹️", x:13, y:13, w:4, h:4, color:"#1a4a1a", roofColor:"#2a8a2a", planetLabel:"ARCADIA"  },
-  { id:"skygazing", label:"OBSERVATORY", emoji:"🔭", x:21, y:13, w:4, h:4, color:"#0a1a3a", roofColor:"#1a3a6a", planetLabel:"CELESTIA" },
-  // Row 3
-  { id:"travel",    label:"ATLAS",       emoji:"🌏", x:3,  y:23, w:4, h:4, color:"#0a3a1a", roofColor:"#1a6a3a", planetLabel:"NOMADIA"  },
-  { id:"writing",   label:"SCRIPTORIUM", emoji:"✍️", x:12, y:23, w:4, h:4, color:"#3a2a0a", roofColor:"#6a4a1a", planetLabel:"SCRIBOS"  },
-  { id:"cinema",    label:"CINEMA",      emoji:"🎬", x:21, y:23, w:4, h:4, color:"#3a0a3a", roofColor:"#6a1a6a", planetLabel:"SCREENIX" },
+  { id:"academy",   label:"ACADEMY",     emoji:"🎓", planetLabel:"ACADEM"   },
+  { id:"library",   label:"LIBRARY",     emoji:"📚", planetLabel:"LIBRARIA" },
+  { id:"arcade",    label:"ARCADE",      emoji:"🕹️", planetLabel:"ARCADIA"  },
+  { id:"shrine",    label:"SHRINE",      emoji:"⛩️", planetLabel:"SHRINIA"  },
+  { id:"lab",       label:"LAB",         emoji:"🔬", planetLabel:"LABRON"   },
+  { id:"cinema",    label:"CINEMA",      emoji:"🎬", planetLabel:"SCREENIX" },
+  { id:"skygazing", label:"OBSERVATORY", emoji:"🔭", planetLabel:"CELESTIA" },
+  { id:"travel",    label:"ATLAS",       emoji:"🌏", planetLabel:"NOMADIA"  },
+  { id:"writing",   label:"SCRIPTORIUM", emoji:"✍️", planetLabel:"SCRIBOS"  },
 ];
 
 // ─── NASA image queries per planet ──────────────────────────────────────────
@@ -70,60 +67,54 @@ const FALLBACK_ICONS: Record<BuildingId, string> = {
   cinema:    "🎬",
 };
 
-// ─── Planet configs — size, glow, and orbital params ─────────────────────────
-interface PlanetCfg { r:number; atmoColor:string; orbitR:number; orbitRy:number; orbitPeriod:number; orbitPhase:number; spinPeriod:number }
+// ─── Planet configs — solar-system layout (orbit around central sun) ─────────
+interface PlanetCfg { r:number; atmoColor:string; orbitalR:number; orbitPeriod:number; startAngle:number; spinPeriod:number }
+const ORBIT_FLATTEN = 0.92; // slight ellipse for tilted-disc look
 const PLANET: Record<BuildingId, PlanetCfg> = {
-  //                  r    atmo        orbitR  orbitRy  period  phase  spin(s)
-  library:   { r:88,  atmoColor:"#c77dff", orbitR:38, orbitRy:14, orbitPeriod:13, orbitPhase:0.00, spinPeriod:28 },
-  lab:       { r:84,  atmoColor:"#48cae4", orbitR:30, orbitRy:11, orbitPeriod:9,  orbitPhase:0.28, spinPeriod:22 },
-  academy:   { r:108, atmoColor:"#f4a261", orbitR:48, orbitRy:17, orbitPeriod:17, orbitPhase:0.55, spinPeriod:18 },
-  shrine:    { r:80,  atmoColor:"#e63946", orbitR:32, orbitRy:12, orbitPeriod:10, orbitPhase:0.40, spinPeriod:35 },
-  arcade:    { r:86,  atmoColor:"#00f5ff", orbitR:34, orbitRy:13, orbitPeriod:11, orbitPhase:0.75, spinPeriod:20 },
-  skygazing: { r:90,  atmoColor:"#90e0ef", orbitR:40, orbitRy:15, orbitPeriod:14, orbitPhase:0.15, spinPeriod:30 },
-  travel:    { r:84,  atmoColor:"#52b788", orbitR:30, orbitRy:11, orbitPeriod:12, orbitPhase:0.65, spinPeriod:25 },
-  writing:   { r:82,  atmoColor:"#ffd60a", orbitR:28, orbitRy:10, orbitPeriod:8,  orbitPhase:0.50, spinPeriod:32 },
-  cinema:    { r:96,  atmoColor:"#ff6b9d", orbitR:44, orbitRy:16, orbitPeriod:15, orbitPhase:0.30, spinPeriod:24 },
+  //                  r    atmo                orbitalR  period(s)  start(0-1)  spin(s)
+  academy:   { r:48, atmoColor:"#f4a261", orbitalR:170, orbitPeriod:32,  startAngle:0.00, spinPeriod:18 },
+  library:   { r:38, atmoColor:"#c77dff", orbitalR:240, orbitPeriod:46,  startAngle:0.18, spinPeriod:28 },
+  arcade:    { r:34, atmoColor:"#00f5ff", orbitalR:310, orbitPeriod:62,  startAngle:0.42, spinPeriod:20 },
+  shrine:    { r:30, atmoColor:"#e63946", orbitalR:380, orbitPeriod:80,  startAngle:0.66, spinPeriod:35 },
+  lab:       { r:38, atmoColor:"#48cae4", orbitalR:450, orbitPeriod:100, startAngle:0.92, spinPeriod:22 },
+  cinema:    { r:34, atmoColor:"#ff6b9d", orbitalR:520, orbitPeriod:122, startAngle:0.30, spinPeriod:24 },
+  skygazing: { r:36, atmoColor:"#90e0ef", orbitalR:590, orbitPeriod:148, startAngle:0.55, spinPeriod:30 },
+  travel:    { r:32, atmoColor:"#52b788", orbitalR:660, orbitPeriod:178, startAngle:0.78, spinPeriod:25 },
+  writing:   { r:30, atmoColor:"#ffd60a", orbitalR:730, orbitPeriod:210, startAngle:0.10, spinPeriod:32 },
 };
 
-// Smooth 36-step elliptical orbit keyframes (cos/sin so the path is a real ellipse)
+// 72-step elliptical orbit keyframes around the central sun
 const ORBIT_KEYFRAMES = Object.entries(PLANET).map(([id, p]) => {
-  const steps = Array.from({ length: 37 }, (_, i) => {
-    const a = (i / 36) * Math.PI * 2;
-    const x = (p.orbitR  * Math.cos(a)).toFixed(2);
-    const y = (p.orbitRy * Math.sin(a)).toFixed(2);
-    return `  ${((i / 36) * 100).toFixed(2)}% { transform: translate(${x}px,${y}px); }`;
+  const steps = Array.from({ length: 73 }, (_, i) => {
+    const a = (i / 72) * Math.PI * 2;
+    const x = (p.orbitalR * Math.cos(a)).toFixed(2);
+    const y = (p.orbitalR * Math.sin(a) * ORBIT_FLATTEN).toFixed(2);
+    return `  ${((i / 72) * 100).toFixed(3)}% { transform: translate(${x}px,${y}px); }`;
   }).join("\n");
   return `@keyframes orbit-${id} {\n${steps}\n}`;
-}).join("\n\n") + `\n\n@keyframes planet-spin {\n  from { transform: scale(1.15) rotate(0deg); }\n  to   { transform: scale(1.15) rotate(360deg); }\n}`;
+}).join("\n\n")
+  + `\n\n@keyframes planet-spin {\n  from { transform: scale(1.15) rotate(0deg); }\n  to   { transform: scale(1.15) rotate(360deg); }\n}`
+  + `\n\n@keyframes sun-pulse {\n  0%,100% { transform: scale(1);    opacity: 1;   }\n  50%     { transform: scale(1.04); opacity: 0.93; }\n}`
+  + `\n\n@keyframes sun-corona {\n  from { transform: rotate(0deg); }\n  to   { transform: rotate(360deg); }\n}`;
 
 
-// ─── Collision helpers ───────────────────────────────────────────────────────
-const WATER_TILES = [
-  { x:0,      y:0,      w:2,      h:MAP_H },
-  { x:MAP_W-2,y:0,      w:2,      h:MAP_H },
-  { x:0,      y:0,      w:MAP_W,  h:2     },
-  { x:0,      y:MAP_H-2,w:MAP_W,  h:2     },
-  { x:8,      y:8,      w:3,      h:3     },
-  { x:8,      y:18,     w:3,      h:3     },
-];
-
+// ─── Collision: just keep the ship inside the map ────────────────────────────
 function isSolid(px: number, py: number): boolean {
-  const col = Math.floor(px/TILE), row = Math.floor(py/TILE);
-  for (const w of WATER_TILES)
-    if (col>=w.x && col<w.x+w.w && row>=w.y && row<w.y+w.h) return true;
-  for (const b of BUILDINGS) {
-    const bx=b.x*TILE, by=b.y*TILE, bw=b.w*TILE, bh=b.h*TILE;
-    if (px+8>=bx && px+8<bx+bw && py+8>=by && py+8<by+bh-8) return true;
-  }
-  if (px<TILE*2 || py<TILE*2 || px>(MAP_W-3)*TILE || py>(MAP_H-3)*TILE) return true;
-  return false;
+  const m = TILE * 2;
+  return px < m || py < m || px > MAP_W*TILE - m || py > MAP_H*TILE - m;
 }
 
+// Returns the planet whose current orbital position is closest to the player
+// (within range). Uses time-based math that mirrors the CSS keyframe.
 function nearBuilding(px: number, py: number): BuildingId | null {
-  const cx=px+12, cy=py+20;
+  const cx = px + 12, cy = py + 20;
+  const now = Date.now() / 1000;
   for (const b of BUILDINGS) {
-    const bx=b.x*TILE+(b.w*TILE)/2, by=(b.y+b.h)*TILE;
-    if (Math.hypot(cx-bx, cy-by) < TILE*1.8) return b.id;
+    const p = PLANET[b.id];
+    const a = ((now / p.orbitPeriod + p.startAngle) % 1) * Math.PI * 2;
+    const planetX = SUN_CX + p.orbitalR * Math.cos(a);
+    const planetY = SUN_CY + p.orbitalR * Math.sin(a) * ORBIT_FLATTEN;
+    if (Math.hypot(cx - planetX, cy - planetY) < p.r + 28) return b.id;
   }
   return null;
 }
@@ -149,19 +140,17 @@ const PLANET_DESCRIPTIONS: Record<BuildingId, string> = {
 function Planet({ b, isNear, onClick, imgSrc }: {
   b: Building; isNear: boolean; onClick: ()=>void; imgSrc?: string | null;
 }) {
-  const { r, atmoColor, orbitPeriod, orbitPhase, spinPeriod } = PLANET[b.id];
+  const { r, atmoColor, orbitPeriod, startAngle, spinPeriod } = PLANET[b.id];
   const [hovered, setHovered] = useState(false);
-  const cx = b.x*TILE + (b.w*TILE)/2;
-  const cy = b.y*TILE + (b.h*TILE)/2;
   const lit = hovered || isNear;
 
   return (
     <Fragment>
-      {/* Orbiting group */}
+      {/* Orbiting group (anchored at the sun) */}
       <div style={{
-        position:"absolute", left: cx, top: cy,
+        position:"absolute", left: SUN_CX, top: SUN_CY,
         animation: `orbit-${b.id} ${orbitPeriod}s linear infinite`,
-        animationDelay: `-${(orbitPhase * orbitPeriod).toFixed(2)}s`,
+        animationDelay: `-${(startAngle * orbitPeriod).toFixed(2)}s`,
         zIndex:2,
       }}>
 
@@ -351,7 +340,7 @@ function StarMap({ planetImgs, onWarp, onClose }: {
 // ─── Main component ──────────────────────────────────────────────────────────
 export default function Overworld() {
   const { theme } = useTheme();
-  const [pos, setPos]             = useState({ x:13*TILE, y:9*TILE });
+  const [pos, setPos]             = useState({ x: SUN_CX + 290, y: SUN_CY - 60 });
   const [facing, setFacing]       = useState<Direction>("down");
   const [moving, setMoving]       = useState(false);
   const [activeBuilding, setActiveBuilding] = useState<BuildingId | null>(null);
@@ -573,26 +562,63 @@ export default function Overworld() {
             targetRef.current = { x: worldX - 12, y: worldY - 12 };
         }}
       >
-        {/* Ground — transparent so NASA galaxy shows through */}
+        {/* Ground — transparent so the galaxy shows through */}
         <div style={{ position:"absolute", inset:0, background:"transparent" }} />
 
-        {/* Asteroids (trees) */}
-        {[
-          [9,5],[10,6],[9,10],[15,6],[16,10],[22,6],[23,7],
-          [2,11],[11,11],[19,11],[27,11],
-          [2,19],[11,19],[19,19],[27,19],
-          [7,25],[16,25],[25,25],
-        ].map(([tx,ty], i) => (
-          <div key={i} style={{
-            position:"absolute", left:tx!*TILE+2, top:ty!*TILE+4,
-            width:TILE-4, height:TILE-6,
-            background:`hsl(${(i*41+200)%360},15%,28%)`,
-            borderRadius: i%3===0 ? "42% 58% 60% 40%/55% 45% 55% 45%"
-                        : i%2===0 ? "60% 40% 45% 55%/50% 60% 40% 50%"
-                        : "50%",
-            opacity:0.75, boxShadow:"inset -3px -2px 6px rgba(0,0,0,0.5)",
+        {/* Central sun (the system's star) */}
+        <div style={{
+          position:"absolute",
+          left: SUN_CX - 70, top: SUN_CY - 70,
+          width: 140, height: 140, borderRadius:"50%",
+          background:`radial-gradient(circle at 50% 50%,
+            #ffffff 0%, #fff5c8 15%, #ffd166 35%, #ff8c2a 65%, rgba(255,80,0,0) 100%)`,
+          boxShadow:`
+            0 0 60px  rgba(255,210,100,0.85),
+            0 0 140px rgba(255,170,60,0.55),
+            0 0 280px rgba(255,140,40,0.32),
+            0 0 480px rgba(255,120,30,0.18)`,
+          animation:"sun-pulse 5s ease-in-out infinite",
+          pointerEvents:"none", zIndex:1,
+        }}>
+          {/* Spinning corona rays */}
+          <div style={{
+            position:"absolute", inset:-40, borderRadius:"50%",
+            background:`conic-gradient(from 0deg,
+              rgba(255,200,80,0) 0deg, rgba(255,200,80,0.18) 8deg, rgba(255,200,80,0) 18deg,
+              rgba(255,200,80,0) 60deg, rgba(255,200,80,0.14) 68deg, rgba(255,200,80,0) 78deg,
+              rgba(255,200,80,0) 130deg, rgba(255,200,80,0.16) 138deg, rgba(255,200,80,0) 148deg,
+              rgba(255,200,80,0) 200deg, rgba(255,200,80,0.13) 208deg, rgba(255,200,80,0) 218deg,
+              rgba(255,200,80,0) 270deg, rgba(255,200,80,0.17) 278deg, rgba(255,200,80,0) 288deg,
+              rgba(255,200,80,0) 330deg, rgba(255,200,80,0.12) 338deg, rgba(255,200,80,0) 348deg)`,
+            animation:"sun-corona 90s linear infinite",
+            mixBlendMode:"screen",
           }} />
-        ))}
+          {/* Inner bright core */}
+          <div style={{
+            position:"absolute", inset:"30%", borderRadius:"50%",
+            background:"radial-gradient(circle, #ffffff 0%, #fff8d4 60%, transparent 100%)",
+            filter:"blur(2px)",
+          }} />
+        </div>
+
+        {/* Distant asteroids (decorative — scattered, not obstacles) */}
+        {Array.from({ length: 28 }).map((_, i) => {
+          const seed = i * 137.5;
+          const angle = seed * (Math.PI / 180);
+          const dist = 80 + ((i * 73) % 720);
+          const ax = SUN_CX + Math.cos(angle) * dist + ((i * 31) % 60 - 30);
+          const ay = SUN_CY + Math.sin(angle) * dist * 0.92 + ((i * 47) % 40 - 20);
+          const sz = 3 + (i % 4);
+          return (
+            <div key={i} style={{
+              position:"absolute", left:ax, top:ay,
+              width:sz, height:sz, borderRadius:"50%",
+              background:`hsl(${(i*23+200)%360},12%,${30+(i%3)*8}%)`,
+              opacity: 0.5,
+              boxShadow:"inset -1px -1px 2px rgba(0,0,0,0.6)",
+            }} />
+          );
+        })}
 
         {/* Planets (real NASA images) */}
         {BUILDINGS.map(b => (
