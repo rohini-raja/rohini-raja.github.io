@@ -151,18 +151,6 @@ function Planet({ b, isNear, onClick, imgSrc }: {
         animationDelay: `-${(orbitPhase * orbitPeriod).toFixed(2)}s`,
         zIndex:2,
       }}>
-        {/* Wide soft atmosphere — no hard edge, bleeds into space */}
-        <div style={{
-          position:"absolute",
-          left:-r*2.4, top:-r*2.4,
-          width:r*4.8, height:r*4.8,
-          borderRadius:"50%",
-          background:`radial-gradient(circle, ${atmoColor}30 0%, ${atmoColor}12 38%, ${atmoColor}04 60%, transparent 76%)`,
-          filter:`blur(${r*0.18}px)`,
-          pointerEvents:"none",
-          opacity: isNear ? 1 : 0.55,
-          transition:"opacity 0.4s",
-        }} />
 
         {/* Planet clickable area — clip but NO border, NO background box */}
         <div onClick={onClick} style={{
@@ -207,11 +195,6 @@ function Planet({ b, isNear, onClick, imgSrc }: {
             background:"radial-gradient(circle at 28% 28%, rgba(255,255,255,0.14) 0%, transparent 48%)",
           }} />
 
-          {/* Thin atmosphere rim */}
-          <div style={{
-            position:"absolute", inset:0, borderRadius:"50%", pointerEvents:"none",
-            boxShadow:`inset 0 0 ${r*0.22}px ${atmoColor}55`,
-          }} />
         </div>
 
         {/* Label */}
