@@ -754,10 +754,13 @@ export default function Overworld() {
             <p style={{ fontFamily:"monospace", fontSize:13, color:"rgba(255,255,255,0.95)", margin:"0 0 10px", letterSpacing:"0.04em", fontWeight:600 }}>
               Welcome to my space!
             </p>
-            <p style={{ fontFamily:"monospace", fontSize:10, color:"rgba(255,255,255,0.6)", margin:"0 0 12px", lineHeight:1.8, maxWidth:320 }}>
-              I have a lot of interests and hobbies, quite a lot actually!<br/>
+            <p style={{ fontFamily:"monospace", fontSize:10, color:"rgba(255,255,255,0.6)", margin:"0 0 12px", lineHeight:1.8, maxWidth:340 }}>
+              My interests and hobbies, it's quite a lot actually!<br/>
               My universe is a little bit chaotic — I struggle to fit in everything,<br/>
-              which seems impossible, but I'm trying!
+              which seems impossible, but I'm trying!<br/>
+              <span style={{ color:"rgba(180,140,255,0.75)" }}>
+                Did you notice the planets in my space orbit on their own without a sun? It's intentional.
+              </span>
             </p>
             <div style={{ width:"100%", height:1, background:"rgba(255,255,255,0.08)", margin:"0 0 10px" }} />
             <p style={{ fontFamily:"monospace", fontSize:10, color:"rgba(255,255,255,0.35)", margin:"0 0 4px", lineHeight:1.7 }}>
