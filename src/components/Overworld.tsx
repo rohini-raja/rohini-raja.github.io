@@ -49,6 +49,7 @@ const BUILDINGS: Building[] = [
 // Hardcoded stable image URLs — bypasses NASA API for specific planets
 const PLANET_IMG_HARDCODED: Partial<Record<BuildingId, string>> = {
   instagram: "https://images-assets.nasa.gov/image/PIA06193/PIA06193~large.jpg",
+  linkedin:  "https://images-assets.nasa.gov/image/PIA22946/PIA22946~large.jpg",
 };
 
 // ─── NASA image queries per planet ──────────────────────────────────────────

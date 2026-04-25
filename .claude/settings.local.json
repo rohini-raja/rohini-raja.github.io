@@ -23,7 +23,8 @@
       "Bash(git commit -m 'Fix all LinkedIn panel name occurrences to Rohini Rajasimman *)",
       "Bash(git commit -m 'Fix doubled name in LinkedIn panel *)",
       "Bash(git commit -m 'Move welcome panel to screen center to fix STAR MAP first-click bug *)",
-      "Bash(git commit -m 'Use working NASA Saturn image URL for CURIOSIA *)"
+      "Bash(git commit -m 'Use working NASA Saturn image URL for CURIOSIA *)",
+      "Bash(git commit -m 'Add Jupiter image \\(JunoCam PIA22946\\) for NEXORIA planet *)"
     ]
   }
 }
