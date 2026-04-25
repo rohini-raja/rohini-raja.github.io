@@ -404,6 +404,11 @@ export default function Overworld() {
   const [isTouchDevice] = useState(() =>
     typeof window !== "undefined" && ("ontouchstart" in window || navigator.maxTouchPoints > 0)
   );
+  const [showControls, setShowControls] = useState(true);
+  useEffect(() => {
+    const t = setTimeout(() => setShowControls(false), 6000);
+    return () => clearTimeout(t);
+  }, []);
 
   const SPEED = 90;
 
@@ -670,11 +675,50 @@ export default function Overworld() {
         })()}
       </AnimatePresence>
 
-      {/* Desktop hint */}
+      {/* Onboarding controls panel — auto-dismisses after 6s */}
+      <AnimatePresence>
+        {showControls && (
+          <motion.div
+            initial={{ opacity:0, y:10 }}
+            animate={{ opacity:1, y:0 }}
+            exit={{ opacity:0, y:10 }}
+            transition={{ duration:0.4 }}
+            onClick={() => setShowControls(false)}
+            style={{
+              position:"fixed", bottom: isTouchDevice ? 220 : 24, left:"50%", transform:"translateX(-50%)",
+              zIndex:50, cursor:"pointer",
+              background:"rgba(4,8,24,0.82)",
+              backdropFilter:"blur(14px)",
+              WebkitBackdropFilter:"blur(14px)",
+              border:"1px solid rgba(255,255,255,0.12)",
+              borderRadius:12, padding:"14px 22px",
+              textAlign:"center",
+            }}
+          >
+            <p style={{ fontFamily:"monospace", fontSize:11, color:"rgba(255,255,255,0.9)", margin:"0 0 6px", letterSpacing:"0.06em" }}>
+              🚀 &nbsp;YOU ARE THE SPACESHIP
+            </p>
+            {isTouchDevice
+              ? <p style={{ fontFamily:"monospace", fontSize:10, color:"rgba(255,255,255,0.5)", margin:0, lineHeight:1.7 }}>
+                  Use the D-pad to fly &nbsp;·&nbsp; tap <b style={{color:"#fff"}}>A</b> near a planet to enter<br/>
+                  tap <b style={{color:"#fff"}}>STAR MAP</b> to jump anywhere
+                </p>
+              : <p style={{ fontFamily:"monospace", fontSize:10, color:"rgba(255,255,255,0.5)", margin:0, lineHeight:1.7 }}>
+                  Arrow keys / WASD to fly &nbsp;·&nbsp; click anywhere to auto-pilot<br/>
+                  Press <b style={{color:"#fff"}}>Enter</b> near a planet to enter &nbsp;·&nbsp; <b style={{color:"#fff"}}>M</b> for star map
+                </p>
+            }
+            <p style={{ fontFamily:"monospace", fontSize:9, color:"rgba(255,255,255,0.25)", margin:"8px 0 0", letterSpacing:"0.04em" }}>
+              tap to dismiss
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Desktop hint (persistent, faint) */}
       {!isTouchDevice && (
-        <div className="fixed bottom-5 right-5" style={{ fontSize:10, color:"rgba(255,255,255,0.22)", zIndex:40, letterSpacing:"0.05em", lineHeight:1.8, textAlign:"right" }}>
-          ↑↓←→ / WASD move &nbsp;·&nbsp; click anywhere &nbsp;·&nbsp; hover planets<br/>
-          Enter explore &nbsp;·&nbsp; [M] star map &nbsp;·&nbsp; [E] cockpit
+        <div className="fixed bottom-5 right-5" style={{ fontSize:9, color:"rgba(255,255,255,0.18)", zIndex:40, letterSpacing:"0.05em", lineHeight:1.8, textAlign:"right" }}>
+          ↑↓←→ / WASD &nbsp;·&nbsp; Enter &nbsp;·&nbsp; M &nbsp;·&nbsp; E
         </div>
       )}
 
