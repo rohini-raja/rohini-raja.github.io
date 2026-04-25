@@ -20,7 +20,8 @@
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" https://rohini-raja.github.io/)",
       "Bash(gh pr *)",
       "Bash(git commit -m 'Fix LinkedIn panel name and title *)",
-      "Bash(git commit -m 'Fix all LinkedIn panel name occurrences to Rohini Rajasimman *)"
+      "Bash(git commit -m 'Fix all LinkedIn panel name occurrences to Rohini Rajasimman *)",
+      "Bash(git commit -m 'Fix doubled name in LinkedIn panel *)"
     ]
   }
 }
