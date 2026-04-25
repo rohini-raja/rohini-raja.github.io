@@ -51,6 +51,32 @@ export default function StarField({ camRef }: Props = {}) {
       sctx.fillRect(0, 0, STAR_SPRITE_R * 2, STAR_SPRITE_R * 2);
     }
 
+    // Diffraction-spike sprite: 4-point cross like Hubble/JWST optics. Reserved
+    // for the brightest stars — that's what makes a starfield read as a telescope photo.
+    const SPIKE_R = 64;
+    const spikeSprite = document.createElement("canvas");
+    spikeSprite.width = spikeSprite.height = SPIKE_R * 2;
+    {
+      const sctx = spikeSprite.getContext("2d")!;
+      const cx = SPIKE_R, cy = SPIKE_R;
+      const drawSpike = (angle: number) => {
+        sctx.save();
+        sctx.translate(cx, cy);
+        sctx.rotate(angle);
+        const grad = sctx.createLinearGradient(-SPIKE_R, 0, SPIKE_R, 0);
+        grad.addColorStop(0,    "rgba(255,255,255,0)");
+        grad.addColorStop(0.42, "rgba(255,255,255,0.05)");
+        grad.addColorStop(0.5,  "rgba(255,255,255,0.85)");
+        grad.addColorStop(0.58, "rgba(255,255,255,0.05)");
+        grad.addColorStop(1,    "rgba(255,255,255,0)");
+        sctx.fillStyle = grad;
+        sctx.fillRect(-SPIKE_R, -0.7, SPIKE_R * 2, 1.4);
+        sctx.restore();
+      };
+      drawSpike(0);
+      drawSpike(Math.PI / 2);
+    }
+
     function resize() {
       dpr = Math.min(window.devicePixelRatio || 1, 2.5);
       const w = window.innerWidth, h = window.innerHeight;
@@ -157,6 +183,28 @@ export default function StarField({ camRef }: Props = {}) {
     build();
     window.addEventListener("resize", () => { resize(); build(); });
 
+    // ─── Dust lanes: dark blobs along spiral arms (gives Hubble-photo contrast) ───
+    interface Dust { x: number; y: number; rx: number; ry: number; rot: number; alpha: number }
+    const dustLanes: Dust[] = [];
+    {
+      const b = 0.26;
+      for (const armOff of [0, Math.PI]) {
+        for (let i = 0; i < 70; i++) {
+          const t2 = 0.18 + (i / 70) * 0.78;
+          const theta = Math.log(t2 / 0.025) / b + armOff - 0.18; // inset from arm center
+          const dx = t2 * Math.cos(theta);
+          const dy = t2 * Math.sin(theta) * 0.38;
+          dustLanes.push({
+            x: dx, y: dy,
+            rx: 0.05 + Math.random() * 0.04,
+            ry: 0.014 + Math.random() * 0.012,
+            rot: theta + Math.PI / 2,
+            alpha: 0.18 + Math.random() * 0.22,
+          });
+        }
+      }
+    }
+
     // ─── HII region positions (relative to galaxy center, pre-defined) ───────
     const hiiRegions = [
       { x: 0.30, y:  0.03, rx: 0.10, ry: 0.038, c: "255,70,50"    },
@@ -208,6 +256,24 @@ export default function StarField({ camRef }: Props = {}) {
       ctx.ellipse(0, 0, R * 0.85, R * 0.34, 0, 0, Math.PI * 2);
       ctx.fill();
 
+      // Dust lanes — drawn over disk, before stars, so they cut through the glow
+      for (const d of dustLanes) {
+        const nx = d.x * R, ny = d.y * R;
+        const rx = d.rx * R, ry = d.ry * R;
+        ctx.save();
+        ctx.translate(nx, ny);
+        ctx.rotate(d.rot);
+        const g = ctx.createRadialGradient(0, 0, 0, 0, 0, Math.max(rx, ry));
+        g.addColorStop(0,   `rgba(8,4,12,${d.alpha.toFixed(3)})`);
+        g.addColorStop(0.6, `rgba(8,4,12,${(d.alpha * 0.4).toFixed(3)})`);
+        g.addColorStop(1,   "rgba(0,0,0,0)");
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
       // HII regions (screen blend so they add light)
       ctx.globalCompositeOperation = "screen";
       for (const n of hiiRegions) {
@@ -233,6 +299,13 @@ export default function StarField({ camRef }: Props = {}) {
         const glowR = Math.max(2, r * 5);
         ctx.globalAlpha = Math.min(1, a * 0.55);
         ctx.drawImage(starSprite, p.x - glowR, p.y - glowR, glowR * 2, glowR * 2);
+
+        // Diffraction spikes for the brightest stars — telescope-photo signature
+        if (p.r > 1.6 && a > 0.55) {
+          const spikeLen = r * 18;
+          ctx.globalAlpha = Math.min(1, (a - 0.4) * 0.9);
+          ctx.drawImage(spikeSprite, p.x - spikeLen, p.y - spikeLen, spikeLen * 2, spikeLen * 2);
+        }
         ctx.globalAlpha = 1;
 
         // Colored core
