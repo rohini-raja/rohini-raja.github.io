@@ -71,18 +71,18 @@ const FALLBACK_ICONS: Record<BuildingId, string> = {
 };
 
 // ─── Planet configs — size, glow, and orbital params ─────────────────────────
-interface PlanetCfg { r:number; atmoColor:string; orbitR:number; orbitRy:number; orbitPeriod:number; orbitPhase:number }
+interface PlanetCfg { r:number; atmoColor:string; orbitR:number; orbitRy:number; orbitPeriod:number; orbitPhase:number; spinPeriod:number }
 const PLANET: Record<BuildingId, PlanetCfg> = {
-  //                  r    atmo        orbitR  orbitRy  period  phase
-  library:   { r:88,  atmoColor:"#c77dff", orbitR:38, orbitRy:14, orbitPeriod:13, orbitPhase:0.00 },
-  lab:       { r:84,  atmoColor:"#48cae4", orbitR:30, orbitRy:11, orbitPeriod:9,  orbitPhase:0.28 },
-  academy:   { r:108, atmoColor:"#f4a261", orbitR:48, orbitRy:17, orbitPeriod:17, orbitPhase:0.55 },
-  shrine:    { r:80,  atmoColor:"#e63946", orbitR:32, orbitRy:12, orbitPeriod:10, orbitPhase:0.40 },
-  arcade:    { r:86,  atmoColor:"#00f5ff", orbitR:34, orbitRy:13, orbitPeriod:11, orbitPhase:0.75 },
-  skygazing: { r:90,  atmoColor:"#90e0ef", orbitR:40, orbitRy:15, orbitPeriod:14, orbitPhase:0.15 },
-  travel:    { r:84,  atmoColor:"#52b788", orbitR:30, orbitRy:11, orbitPeriod:12, orbitPhase:0.65 },
-  writing:   { r:82,  atmoColor:"#ffd60a", orbitR:28, orbitRy:10, orbitPeriod:8,  orbitPhase:0.50 },
-  cinema:    { r:96,  atmoColor:"#ff6b9d", orbitR:44, orbitRy:16, orbitPeriod:15, orbitPhase:0.30 },
+  //                  r    atmo        orbitR  orbitRy  period  phase  spin(s)
+  library:   { r:88,  atmoColor:"#c77dff", orbitR:38, orbitRy:14, orbitPeriod:13, orbitPhase:0.00, spinPeriod:28 },
+  lab:       { r:84,  atmoColor:"#48cae4", orbitR:30, orbitRy:11, orbitPeriod:9,  orbitPhase:0.28, spinPeriod:22 },
+  academy:   { r:108, atmoColor:"#f4a261", orbitR:48, orbitRy:17, orbitPeriod:17, orbitPhase:0.55, spinPeriod:18 },
+  shrine:    { r:80,  atmoColor:"#e63946", orbitR:32, orbitRy:12, orbitPeriod:10, orbitPhase:0.40, spinPeriod:35 },
+  arcade:    { r:86,  atmoColor:"#00f5ff", orbitR:34, orbitRy:13, orbitPeriod:11, orbitPhase:0.75, spinPeriod:20 },
+  skygazing: { r:90,  atmoColor:"#90e0ef", orbitR:40, orbitRy:15, orbitPeriod:14, orbitPhase:0.15, spinPeriod:30 },
+  travel:    { r:84,  atmoColor:"#52b788", orbitR:30, orbitRy:11, orbitPeriod:12, orbitPhase:0.65, spinPeriod:25 },
+  writing:   { r:82,  atmoColor:"#ffd60a", orbitR:28, orbitRy:10, orbitPeriod:8,  orbitPhase:0.50, spinPeriod:32 },
+  cinema:    { r:96,  atmoColor:"#ff6b9d", orbitR:44, orbitRy:16, orbitPeriod:15, orbitPhase:0.30, spinPeriod:24 },
 };
 
 // Smooth 36-step elliptical orbit keyframes (cos/sin so the path is a real ellipse)
@@ -94,7 +94,7 @@ const ORBIT_KEYFRAMES = Object.entries(PLANET).map(([id, p]) => {
     return `  ${((i / 36) * 100).toFixed(2)}% { transform: translate(${x}px,${y}px); }`;
   }).join("\n");
   return `@keyframes orbit-${id} {\n${steps}\n}`;
-}).join("\n\n");
+}).join("\n\n") + `\n\n@keyframes planet-spin {\n  from { transform: scale(1.15) rotate(0deg); }\n  to   { transform: scale(1.15) rotate(360deg); }\n}`;
 
 
 // ─── Collision helpers ───────────────────────────────────────────────────────
@@ -137,7 +137,7 @@ const BUILDING_COMPONENTS: Record<BuildingId, React.ComponentType<{ onClose: ()=
 function Planet({ b, isNear, onClick, imgSrc }: {
   b: Building; isNear: boolean; onClick: ()=>void; imgSrc?: string | null;
 }) {
-  const { r, atmoColor, orbitR, orbitRy, orbitPeriod, orbitPhase } = PLANET[b.id];
+  const { r, atmoColor, orbitR, orbitRy, orbitPeriod, orbitPhase, spinPeriod } = PLANET[b.id];
   // Anchor = static centre of the building tile
   const cx = b.x*TILE + (b.w*TILE)/2;
   const cy = b.y*TILE + (b.h*TILE)/2;
@@ -178,19 +178,33 @@ function Planet({ b, isNear, onClick, imgSrc }: {
         }}>
           {imgSrc
             ? <img src={imgSrc} alt={b.planetLabel}
-                style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
+                style={{ width:"100%", height:"100%", objectFit:"cover", display:"block",
+                  animation:`planet-spin ${spinPeriod}s linear infinite` }} />
             : <div style={{
                 width:"100%", height:"100%",
                 display:"flex", alignItems:"center", justifyContent:"center",
                 fontSize:r*0.65, userSelect:"none",
                 background:`radial-gradient(circle at 38% 35%, ${atmoColor}40, #020510)`,
+                animation:`planet-spin ${spinPeriod}s linear infinite`,
               }}>{FALLBACK_ICONS[b.id]}</div>
           }
 
-          {/* Limb darkening — dark edge vignette for 3-D depth */}
+          {/* Limb darkening — consistent with top-left star light source */}
           <div style={{
             position:"absolute", inset:0, borderRadius:"50%", pointerEvents:"none",
-            background:"radial-gradient(circle at 38% 35%, transparent 45%, rgba(0,0,0,0.55) 100%)",
+            background:"radial-gradient(circle at 35% 30%, transparent 40%, rgba(0,0,0,0.52) 100%)",
+          }} />
+
+          {/* Directional shadow — bottom-right unlit face */}
+          <div style={{
+            position:"absolute", inset:0, borderRadius:"50%", pointerEvents:"none",
+            background:"radial-gradient(circle at 72% 68%, rgba(0,0,0,0.68) 18%, transparent 62%)",
+          }} />
+
+          {/* Specular highlight — star reflection top-left */}
+          <div style={{
+            position:"absolute", inset:0, borderRadius:"50%", pointerEvents:"none",
+            background:"radial-gradient(circle at 28% 28%, rgba(255,255,255,0.14) 0%, transparent 48%)",
           }} />
 
           {/* Thin atmosphere rim */}
@@ -239,6 +253,7 @@ export default function Overworld() {
   const animRef      = useRef<number>(0);
   const lastRef      = useRef<number>(0);
   const containerRef = useRef<HTMLDivElement>(null);
+  const camRef       = useRef({ x: 0, y: 0 });
 
   const konamiRef = useRef<string[]>([]);
   const KONAMI    = ["ArrowUp","ArrowUp","ArrowDown","ArrowDown","ArrowLeft","ArrowRight","ArrowLeft","ArrowRight","b","a"];
@@ -381,6 +396,7 @@ export default function Overworld() {
 
   const camX = Math.max(0, Math.min(pos.x - window.innerWidth/2,  MAP_W*TILE - window.innerWidth));
   const camY = Math.max(0, Math.min(pos.y - window.innerHeight/2, MAP_H*TILE - window.innerHeight));
+  camRef.current = { x: camX, y: camY };
 
   return (
     <div
@@ -393,7 +409,7 @@ export default function Overworld() {
       <style>{ORBIT_KEYFRAMES}</style>
 
       {/* ── Animated starfield background ── */}
-      <StarField />
+      <StarField camRef={camRef} />
 
 
       {/* ── Map ── */}

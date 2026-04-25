@@ -1,5 +1,9 @@
 import { useEffect, useRef } from "react";
 
+interface Props {
+  camRef?: React.MutableRefObject<{ x: number; y: number }>;
+}
+
 interface Particle {
   x: number; y: number;
   r: number;
@@ -15,7 +19,7 @@ interface Shooter {
   life: number; maxLife: number;
 }
 
-export default function StarField() {
+export default function StarField({ camRef }: Props = {}) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -142,7 +146,10 @@ export default function StarField() {
     // ─── Draw loop ────────────────────────────────────────────────────────────
     function draw() {
       const w = canvas!.width, h = canvas!.height;
-      const cx = w * 0.5, cy = h * 0.5;
+      // Parallax: galaxy drifts at 8% of camera movement, making it feel infinitely far
+      const cam = camRef?.current ?? { x: 0, y: 0 };
+      const cx = w * 0.5 - cam.x * 0.08;
+      const cy = h * 0.5 - cam.y * 0.08;
       const R = Math.min(w, h) * 0.44;
 
       ctx.clearRect(0, 0, w, h);
