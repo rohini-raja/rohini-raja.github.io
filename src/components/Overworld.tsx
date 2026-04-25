@@ -133,14 +133,27 @@ const BUILDING_COMPONENTS: Record<BuildingId, React.ComponentType<{ onClose: ()=
   skygazing:Skygazing, travel:Travel, writing:Writing, cinema:Cinema,
 };
 
+const PLANET_DESCRIPTIONS: Record<BuildingId, string> = {
+  library:   "Books & Literature",
+  lab:       "Research & Tech",
+  academy:   "Education & Learning",
+  shrine:    "Reflections",
+  arcade:    "Games & Fun",
+  skygazing: "Astronomy & Space",
+  travel:    "Adventures & Places",
+  writing:   "Stories & Writing",
+  cinema:    "Films & Cinema",
+};
+
 // ─── Planet renderer — orbiting wrapper + NASA photo ─────────────────────────
 function Planet({ b, isNear, onClick, imgSrc }: {
   b: Building; isNear: boolean; onClick: ()=>void; imgSrc?: string | null;
 }) {
-  const { r, atmoColor, orbitR, orbitRy, orbitPeriod, orbitPhase, spinPeriod } = PLANET[b.id];
-  // Anchor = static centre of the building tile
+  const { r, atmoColor, orbitPeriod, orbitPhase, spinPeriod } = PLANET[b.id];
+  const [hovered, setHovered] = useState(false);
   const cx = b.x*TILE + (b.w*TILE)/2;
   const cy = b.y*TILE + (b.h*TILE)/2;
+  const lit = hovered || isNear;
 
   return (
     <Fragment>
@@ -152,18 +165,43 @@ function Planet({ b, isNear, onClick, imgSrc }: {
         zIndex:2,
       }}>
 
-        {/* Planet clickable area — clip but NO border, NO background box */}
-        <div onClick={onClick} style={{
-          position:"absolute", left:-r, top:-r,
-          width:r*2, height:r*2,
-          borderRadius:"50%", overflow:"hidden",
-          cursor:"pointer",
-          // drop-shadow replaces hard box-shadow ring — glow bleeds outward naturally
-          filter: isNear
-            ? `drop-shadow(0 0 ${r*0.3}px ${atmoColor}) drop-shadow(0 0 ${r*0.6}px ${atmoColor}70)`
-            : `drop-shadow(0 0 ${r*0.12}px ${atmoColor}50)`,
-          transition:"filter 0.4s",
-        }}>
+        {/* Hover tooltip — visible even when far away */}
+        <AnimatePresence>
+          {hovered && !isNear && (
+            <motion.div
+              initial={{ opacity:0, y:4 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0, y:4 }}
+              transition={{ duration:0.14 }}
+              style={{
+                position:"absolute", left:"50%", transform:"translateX(-50%)",
+                top:-r-48, whiteSpace:"nowrap", pointerEvents:"none", zIndex:30,
+                fontFamily:"monospace", fontSize:10, color:"#fff",
+                background:"rgba(0,0,0,0.78)", backdropFilter:"blur(8px)",
+                border:`1px solid ${atmoColor}55`, borderRadius:6, padding:"5px 13px",
+                boxShadow:`0 0 14px ${atmoColor}30`,
+              }}
+            >
+              {b.emoji} {b.planetLabel} &nbsp;·&nbsp;
+              <span style={{ color:atmoColor }}>click to enter</span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Planet clickable area */}
+        <div
+          onClick={e => { e.stopPropagation(); onClick(); }}
+          onMouseEnter={() => setHovered(true)}
+          onMouseLeave={() => setHovered(false)}
+          style={{
+            position:"absolute", left:-r, top:-r,
+            width:r*2, height:r*2,
+            borderRadius:"50%", overflow:"hidden",
+            cursor:"pointer",
+            filter: lit
+              ? `drop-shadow(0 0 ${r*0.3}px ${atmoColor}) drop-shadow(0 0 ${r*0.6}px ${atmoColor}70)`
+              : `drop-shadow(0 0 ${r*0.12}px ${atmoColor}50)`,
+            transition:"filter 0.3s",
+            transform: hovered ? "scale(1.06)" : "scale(1)",
+          }}>
           {imgSrc
             ? <img src={imgSrc} alt={b.planetLabel}
                 style={{ width:"100%", height:"100%", objectFit:"cover", display:"block",
@@ -176,25 +214,12 @@ function Planet({ b, isNear, onClick, imgSrc }: {
                 animation:`planet-spin ${spinPeriod}s linear infinite`,
               }}>{FALLBACK_ICONS[b.id]}</div>
           }
-
-          {/* Limb darkening — consistent with top-left star light source */}
-          <div style={{
-            position:"absolute", inset:0, borderRadius:"50%", pointerEvents:"none",
-            background:"radial-gradient(circle at 35% 30%, transparent 40%, rgba(0,0,0,0.52) 100%)",
-          }} />
-
-          {/* Directional shadow — bottom-right unlit face */}
-          <div style={{
-            position:"absolute", inset:0, borderRadius:"50%", pointerEvents:"none",
-            background:"radial-gradient(circle at 72% 68%, rgba(0,0,0,0.68) 18%, transparent 62%)",
-          }} />
-
-          {/* Specular highlight — star reflection top-left */}
-          <div style={{
-            position:"absolute", inset:0, borderRadius:"50%", pointerEvents:"none",
-            background:"radial-gradient(circle at 28% 28%, rgba(255,255,255,0.14) 0%, transparent 48%)",
-          }} />
-
+          <div style={{ position:"absolute", inset:0, borderRadius:"50%", pointerEvents:"none",
+            background:"radial-gradient(circle at 35% 30%, transparent 40%, rgba(0,0,0,0.52) 100%)" }} />
+          <div style={{ position:"absolute", inset:0, borderRadius:"50%", pointerEvents:"none",
+            background:"radial-gradient(circle at 72% 68%, rgba(0,0,0,0.68) 18%, transparent 62%)" }} />
+          <div style={{ position:"absolute", inset:0, borderRadius:"50%", pointerEvents:"none",
+            background:"radial-gradient(circle at 28% 28%, rgba(255,255,255,0.14) 0%, transparent 48%)" }} />
         </div>
 
         {/* Label */}
@@ -203,8 +228,8 @@ function Planet({ b, isNear, onClick, imgSrc }: {
           width:r*3, textAlign:"center",
           fontFamily:'"Share Tech Mono",monospace',
           fontSize:9, letterSpacing:"0.1em",
-          color: isNear ? "#fff" : "rgba(255,255,255,0.38)",
-          textShadow: isNear ? `0 0 18px ${atmoColor}, 0 0 6px ${atmoColor}` : "none",
+          color: lit ? "#fff" : "rgba(255,255,255,0.38)",
+          textShadow: lit ? `0 0 18px ${atmoColor}, 0 0 6px ${atmoColor}` : "none",
           pointerEvents:"none", whiteSpace:"nowrap",
           transition:"color 0.3s, text-shadow 0.3s",
         }}>
@@ -212,6 +237,114 @@ function Planet({ b, isNear, onClick, imgSrc }: {
         </div>
       </div>
     </Fragment>
+  );
+}
+
+// ─── Star Map overlay ────────────────────────────────────────────────────────
+function StarMap({ planetImgs, onWarp, onClose }: {
+  planetImgs: Partial<Record<BuildingId, string>>;
+  onWarp: (id: BuildingId) => void;
+  onClose: () => void;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity:0 }} animate={{ opacity:1 }} exit={{ opacity:0 }}
+      transition={{ duration:0.25 }}
+      style={{
+        position:"fixed", inset:0, zIndex:80,
+        background:"rgba(0,1,10,0.93)", backdropFilter:"blur(24px)", WebkitBackdropFilter:"blur(24px)",
+        display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
+        padding:"32px 20px", overflow:"auto",
+      }}
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ y:24, opacity:0 }} animate={{ y:0, opacity:1 }}
+        transition={{ delay:0.08, duration:0.35 }}
+        onClick={e => e.stopPropagation()}
+        style={{ width:"100%", maxWidth:860 }}
+      >
+        {/* Header */}
+        <div style={{ textAlign:"center", marginBottom:32 }}>
+          <div style={{ fontFamily:"monospace", fontSize:9, color:"#00e5ff55", letterSpacing:"0.35em", marginBottom:10 }}>
+            ◈ GALACTIC NAVIGATION SYSTEM
+          </div>
+          <div style={{ fontFamily:"monospace", fontSize:24, color:"#fff", letterSpacing:"0.12em", fontWeight:300 }}>
+            SELECT DESTINATION
+          </div>
+          <div style={{ fontFamily:"monospace", fontSize:9, color:"rgba(255,255,255,0.28)", marginTop:8, letterSpacing:"0.1em" }}>
+            CLICK ANY PLANET TO WARP THERE INSTANTLY
+          </div>
+        </div>
+
+        {/* Grid */}
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:12 }}>
+          {BUILDINGS.map((b, i) => {
+            const { atmoColor } = PLANET[b.id];
+            const img = planetImgs[b.id];
+            return (
+              <motion.div
+                key={b.id}
+                initial={{ opacity:0, y:12 }} animate={{ opacity:1, y:0 }}
+                transition={{ delay:0.12 + i*0.04, duration:0.28 }}
+                whileHover={{ scale:1.04, y:-3 }} whileTap={{ scale:0.97 }}
+                onClick={() => onWarp(b.id)}
+                style={{
+                  cursor:"pointer",
+                  background:`linear-gradient(145deg, rgba(255,255,255,0.04) 0%, rgba(0,0,0,0.25) 100%)`,
+                  border:`1px solid ${atmoColor}25`, borderRadius:14,
+                  padding:"18px 14px 14px",
+                  display:"flex", flexDirection:"column", alignItems:"center", gap:10,
+                  transition:"border-color 0.2s, box-shadow 0.2s",
+                }}
+                onMouseEnter={e => {
+                  (e.currentTarget as HTMLElement).style.borderColor = `${atmoColor}65`;
+                  (e.currentTarget as HTMLElement).style.boxShadow = `0 0 28px ${atmoColor}22, inset 0 0 20px ${atmoColor}08`;
+                }}
+                onMouseLeave={e => {
+                  (e.currentTarget as HTMLElement).style.borderColor = `${atmoColor}25`;
+                  (e.currentTarget as HTMLElement).style.boxShadow = "none";
+                }}
+              >
+                <div style={{
+                  width:70, height:70, borderRadius:"50%", overflow:"hidden", flexShrink:0,
+                  boxShadow:`0 0 26px ${atmoColor}55, 0 0 8px ${atmoColor}80`, position:"relative",
+                }}>
+                  {img
+                    ? <img src={img} style={{ width:"100%", height:"100%", objectFit:"cover" }} alt={b.planetLabel} />
+                    : <div style={{ width:"100%", height:"100%", display:"flex", alignItems:"center",
+                        justifyContent:"center", fontSize:30,
+                        background:`radial-gradient(circle at 35% 30%, ${atmoColor}50, #020510)` }}>
+                        {FALLBACK_ICONS[b.id]}
+                      </div>
+                  }
+                  <div style={{ position:"absolute", inset:0, borderRadius:"50%", pointerEvents:"none",
+                    background:"radial-gradient(circle at 35% 30%, transparent 40%, rgba(0,0,0,0.5) 100%)" }} />
+                  <div style={{ position:"absolute", inset:0, borderRadius:"50%", pointerEvents:"none",
+                    background:"radial-gradient(circle at 72% 68%, rgba(0,0,0,0.6) 18%, transparent 60%)" }} />
+                </div>
+                <div style={{ textAlign:"center" }}>
+                  <div style={{ fontFamily:"monospace", fontSize:12, color:"#fff", letterSpacing:"0.1em", marginBottom:4 }}>
+                    {b.emoji} {b.planetLabel}
+                  </div>
+                  <div style={{ fontFamily:"monospace", fontSize:8, color:`${atmoColor}bb`, letterSpacing:"0.06em" }}>
+                    {PLANET_DESCRIPTIONS[b.id]}
+                  </div>
+                </div>
+                <div style={{ fontFamily:"monospace", fontSize:8, color:`${atmoColor}70`, letterSpacing:"0.2em" }}>
+                  ▶ WARP
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+
+        <div style={{ textAlign:"center", marginTop:22, fontFamily:"monospace", fontSize:9,
+          color:"rgba(255,255,255,0.18)", letterSpacing:"0.12em" }}>
+          [M] CLOSE &nbsp;·&nbsp; ESC DISMISS &nbsp;·&nbsp; CLICK OUTSIDE TO EXIT
+        </div>
+      </motion.div>
+    </motion.div>
   );
 }
 
@@ -224,8 +357,18 @@ export default function Overworld() {
   const [activeBuilding, setActiveBuilding] = useState<BuildingId | null>(null);
   const [nearBy, setNearBy]       = useState<BuildingId | null>(null);
   const [cockpitOpen, setCockpitOpen] = useState(false);
-  // Velocity refs for smooth momentum-based movement
-  const velRef = useRef({ vx:0, vy:0 });
+  const [warpColor, setWarpColor] = useState<string | null>(null);
+  const [starMapOpen, setStarMapOpen] = useState(false);
+  const velRef    = useRef({ vx:0, vy:0 });
+  const targetRef = useRef<{x:number; y:number} | null>(null);
+
+  const enterPlanet = useCallback((id: BuildingId) => {
+    setStarMapOpen(false);
+    const color = PLANET[id].atmoColor;
+    setWarpColor(color);
+    setTimeout(() => setActiveBuilding(id), 260);
+    setTimeout(() => setWarpColor(null), 950);
+  }, []);
 
   // NASA data
   const [epicUrl, setEpicUrl]       = useState<string | null>(null);
@@ -299,10 +442,28 @@ export default function Overworld() {
     lastRef.current = now;
     const keys = keysRef.current;
     let ix = 0, iy = 0;
+    const hasKeys = keys.has("ArrowLeft")||keys.has("a")||keys.has("A")||
+      keys.has("ArrowRight")||keys.has("d")||keys.has("D")||
+      keys.has("ArrowUp")||keys.has("w")||keys.has("W")||
+      keys.has("ArrowDown")||keys.has("s")||keys.has("S");
+
     if (keys.has("ArrowLeft")  || keys.has("a") || keys.has("A")) { ix -= 1; setFacing("left");  }
     if (keys.has("ArrowRight") || keys.has("d") || keys.has("D")) { ix += 1; setFacing("right"); }
     if (keys.has("ArrowUp")    || keys.has("w") || keys.has("W")) { iy -= 1; setFacing("up");    }
     if (keys.has("ArrowDown")  || keys.has("s") || keys.has("S")) { iy += 1; setFacing("down");  }
+    if (hasKeys) targetRef.current = null;
+
+    // Click-to-navigate: steer toward clicked target when no keys held
+    if (!hasKeys && targetRef.current) {
+      const dx = targetRef.current.x - pos.x;
+      const dy = targetRef.current.y - pos.y;
+      const dist = Math.hypot(dx, dy);
+      if (dist < 20) { targetRef.current = null; }
+      else {
+        ix = dx / dist; iy = dy / dist;
+        setFacing(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? "right" : "left") : (dy > 0 ? "down" : "up"));
+      }
+    }
 
     const len = Math.hypot(ix, iy);
     if (len > 0) { ix /= len; iy /= len; }
@@ -342,10 +503,11 @@ export default function Overworld() {
       keysRef.current.add(e.key);
       if (e.key === " " || e.key === "Enter") {
         const nb = nearBuilding(pos.x, pos.y);
-        if (nb) setActiveBuilding(nb);
+        if (nb) enterPlanet(nb);
       }
-      if (e.key === "Escape") { setActiveBuilding(null); setCockpitOpen(false); }
+      if (e.key === "Escape") { setActiveBuilding(null); setCockpitOpen(false); setStarMapOpen(false); }
       if (e.key === "e" || e.key === "E") setCockpitOpen(o => !o);
+      if (e.key === "m" || e.key === "M") setStarMapOpen(o => !o);
       konamiRef.current.push(e.key);
       konamiRef.current = konamiRef.current.slice(-10);
       if (konamiRef.current.join(",") === KONAMI.join(",")) {
@@ -396,12 +558,21 @@ export default function Overworld() {
 
 
       {/* ── Map ── */}
-      <div style={{
-        width:MAP_W*TILE, height:MAP_H*TILE,
-        position:"relative",
-        transform:`translate(${-camX}px,${-camY}px)`,
-        willChange:"transform", zIndex:3,
-      }}>
+      <div
+        style={{
+          width:MAP_W*TILE, height:MAP_H*TILE,
+          position:"relative",
+          transform:`translate(${-camX}px,${-camY}px)`,
+          willChange:"transform", zIndex:3,
+          cursor:"crosshair",
+        }}
+        onClick={e => {
+          const worldX = e.clientX + camRef.current.x;
+          const worldY = e.clientY + camRef.current.y;
+          if (!isSolid(worldX - 12, worldY - 12))
+            targetRef.current = { x: worldX - 12, y: worldY - 12 };
+        }}
+      >
         {/* Ground — transparent so NASA galaxy shows through */}
         <div style={{ position:"absolute", inset:0, background:"transparent" }} />
 
@@ -429,7 +600,7 @@ export default function Overworld() {
             key={b.id}
             b={b}
             isNear={nearBy === b.id}
-            onClick={() => setActiveBuilding(b.id)}
+            onClick={() => enterPlanet(b.id)}
             imgSrc={planetImgs[b.id]}
           />
         ))}
@@ -497,8 +668,9 @@ export default function Overworld() {
 
       {/* Desktop hint */}
       {!isTouchDevice && (
-        <div className="fixed bottom-5 right-5" style={{ fontSize:11, color:"rgba(255,255,255,0.25)", zIndex:40, letterSpacing:"0.05em" }}>
-          ↑↓←→ move &nbsp;·&nbsp; Enter explore
+        <div className="fixed bottom-5 right-5" style={{ fontSize:10, color:"rgba(255,255,255,0.22)", zIndex:40, letterSpacing:"0.05em", lineHeight:1.8, textAlign:"right" }}>
+          ↑↓←→ / WASD move &nbsp;·&nbsp; click anywhere &nbsp;·&nbsp; hover planets<br/>
+          Enter explore &nbsp;·&nbsp; [M] star map &nbsp;·&nbsp; [E] cockpit
         </div>
       )}
 
@@ -588,27 +760,98 @@ export default function Overworld() {
         })()}
       </AnimatePresence>
 
-      {/* Cockpit button */}
-      <motion.button
-        onClick={() => setCockpitOpen(true)}
-        whileHover={{ scale:1.05 }} whileTap={{ scale:0.97 }}
-        style={{
-          position:"fixed", bottom:24, right:24,
-          background:"rgba(0,229,255,0.12)",
-          backdropFilter:"blur(12px)",
-          border:"1px solid rgba(0,229,255,0.4)",
-          color:"#00e5ff", fontFamily:"monospace",
-          fontSize:10, letterSpacing:"0.12em",
-          padding:"9px 18px", cursor:"pointer",
-          zIndex:40, borderRadius:4,
-        }}
-      >
-        ◈ COCKPIT  [E]
-      </motion.button>
+      {/* Bottom-right buttons (desktop only) */}
+      {!isTouchDevice && <div style={{ position:"fixed", bottom:24, right:24, zIndex:40, display:"flex", gap:8 }}>
+        <motion.button
+          onClick={() => setStarMapOpen(o => !o)}
+          whileHover={{ scale:1.05 }} whileTap={{ scale:0.97 }}
+          style={{
+            background:"rgba(180,100,255,0.12)", backdropFilter:"blur(12px)",
+            border:"1px solid rgba(180,100,255,0.4)",
+            color:"#b87fff", fontFamily:"monospace",
+            fontSize:10, letterSpacing:"0.12em",
+            padding:"9px 18px", cursor:"pointer", borderRadius:4,
+          }}
+        >
+          ⊹ STAR MAP  [M]
+        </motion.button>
+        <motion.button
+          onClick={() => setCockpitOpen(true)}
+          whileHover={{ scale:1.05 }} whileTap={{ scale:0.97 }}
+          style={{
+            background:"rgba(0,229,255,0.12)", backdropFilter:"blur(12px)",
+            border:"1px solid rgba(0,229,255,0.4)",
+            color:"#00e5ff", fontFamily:"monospace",
+            fontSize:10, letterSpacing:"0.12em",
+            padding:"9px 18px", cursor:"pointer", borderRadius:4,
+          }}
+        >
+          ◈ COCKPIT  [E]
+        </motion.button>
+      </div>}
+
+      {/* Mobile star map button */}
+      {isTouchDevice && (
+        <motion.button
+          onClick={() => setStarMapOpen(o => !o)}
+          whileTap={{ scale:0.95 }}
+          style={{
+            position:"fixed", bottom:24, left:"50%", transform:"translateX(-50%)",
+            background:"rgba(180,100,255,0.18)", backdropFilter:"blur(12px)",
+            border:"1px solid rgba(180,100,255,0.5)",
+            color:"#b87fff", fontFamily:"monospace",
+            fontSize:11, letterSpacing:"0.1em",
+            padding:"10px 22px", cursor:"pointer", borderRadius:20, zIndex:49,
+          }}
+        >
+          ⊹ STAR MAP
+        </motion.button>
+      )}
+
+      {/* Warp entry flash */}
+      <AnimatePresence>
+        {warpColor && (
+          <>
+            <motion.div
+              key="warp-streak"
+              initial={{ opacity:0, scale:0.8 }}
+              animate={{ opacity:[0, 0.5, 0], scale:[0.8, 1.8, 2.4] }}
+              transition={{ duration:0.75, times:[0, 0.3, 1] }}
+              style={{
+                position:"fixed", inset:"-40%", zIndex:87, pointerEvents:"none",
+                background:`repeating-conic-gradient(from 0deg, ${warpColor}18 0deg 4deg, transparent 4deg 20deg)`,
+                borderRadius:"50%",
+              }}
+            />
+            <motion.div
+              key="warp-flash"
+              initial={{ opacity:0 }}
+              animate={{ opacity:[0, 1, 0.85, 0] }}
+              transition={{ duration:0.85, times:[0, 0.14, 0.55, 1] }}
+              style={{
+                position:"fixed", inset:0, zIndex:88, pointerEvents:"none",
+                background:`radial-gradient(ellipse at 50% 50%, rgba(255,255,255,0.97) 0%, ${warpColor}ee 28%, ${warpColor}99 58%, transparent 100%)`,
+              }}
+            />
+          </>
+        )}
+      </AnimatePresence>
 
       {/* Cockpit overlay */}
       <AnimatePresence>
         {cockpitOpen && <Cockpit key="cockpit" onClose={() => setCockpitOpen(false)} />}
+      </AnimatePresence>
+
+      {/* Star Map overlay */}
+      <AnimatePresence>
+        {starMapOpen && (
+          <StarMap
+            key="starmap"
+            planetImgs={planetImgs}
+            onWarp={enterPlanet}
+            onClose={() => setStarMapOpen(false)}
+          />
+        )}
       </AnimatePresence>
     </div>
   );
