@@ -48,7 +48,7 @@ const BUILDINGS: Building[] = [
 
 // Hardcoded stable image URLs — bypasses NASA API for specific planets
 const PLANET_IMG_HARDCODED: Partial<Record<BuildingId, string>> = {
-  instagram: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Saturn_during_Equinox.jpg/800px-Saturn_during_Equinox.jpg",
+  instagram: "https://images-assets.nasa.gov/image/PIA06193/PIA06193~large.jpg",
 };
 
 // ─── NASA image queries per planet ──────────────────────────────────────────
