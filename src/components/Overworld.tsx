@@ -904,22 +904,39 @@ export default function Overworld() {
         </motion.button>
       </div>}
 
-      {/* Mobile star map button */}
+      {/* Mobile bottom buttons */}
       {isTouchDevice && (
-        <motion.button
-          onClick={() => setStarMapOpen(o => !o)}
-          whileTap={{ scale:0.95 }}
-          style={{
-            position:"fixed", bottom:24, left:"50%", transform:"translateX(-50%)",
-            background:"rgba(180,100,255,0.18)", backdropFilter:"blur(12px)",
-            border:"1px solid rgba(180,100,255,0.5)",
-            color:"#b87fff", fontFamily:"monospace",
-            fontSize:11, letterSpacing:"0.1em",
-            padding:"10px 22px", cursor:"pointer", borderRadius:20, zIndex:49,
-          }}
-        >
-          ⊹ STAR MAP
-        </motion.button>
+        <div style={{
+          position:"fixed", bottom:24, left:"50%", transform:"translateX(-50%)",
+          display:"flex", gap:8, zIndex:49,
+        }}>
+          <motion.button
+            onClick={() => setStarMapOpen(o => !o)}
+            whileTap={{ scale:0.95 }}
+            style={{
+              background:"rgba(180,100,255,0.18)", backdropFilter:"blur(12px)",
+              border:"1px solid rgba(180,100,255,0.5)",
+              color:"#b87fff", fontFamily:"monospace",
+              fontSize:11, letterSpacing:"0.1em",
+              padding:"10px 18px", cursor:"pointer", borderRadius:20,
+            }}
+          >
+            ⊹ STAR MAP
+          </motion.button>
+          <motion.button
+            onClick={() => setCockpitOpen(true)}
+            whileTap={{ scale:0.95 }}
+            style={{
+              background:"rgba(0,229,255,0.18)", backdropFilter:"blur(12px)",
+              border:"1px solid rgba(0,229,255,0.5)",
+              color:"#00e5ff", fontFamily:"monospace",
+              fontSize:11, letterSpacing:"0.1em",
+              padding:"10px 18px", cursor:"pointer", borderRadius:20,
+            }}
+          >
+            ◈ COCKPIT
+          </motion.button>
+        </div>
       )}
 
       {/* Warp entry flash */}
