@@ -64,10 +64,10 @@ export default function LinkedIn({ onClose }: Props) {
               boxShadow: `0 0 24px ${COLOR}50`,
             }}>👩‍💻</div>
             <p style={{ fontFamily: "monospace", fontSize: 14, color: theme.text, margin: "0 0 4px", fontWeight: 700 }}>
-              Rohini Raja
+              Rohini Rajasimman
             </p>
             <p style={{ fontFamily: "monospace", fontSize: 10, color: "rgba(255,255,255,0.4)", margin: 0, lineHeight: 1.6 }}>
-              Software Engineer
+              Engineer
             </p>
           </div>
 
