@@ -455,7 +455,7 @@ export default function Overworld() {
   );
   const [showControls, setShowControls] = useState(true);
   useEffect(() => {
-    const t = setTimeout(() => setShowControls(false), 6000);
+    const t = setTimeout(() => setShowControls(false), 11000);
     return () => clearTimeout(t);
   }, []);
 
@@ -731,9 +731,10 @@ export default function Overworld() {
         })()}
       </AnimatePresence>
 
-      {/* Onboarding controls panel — auto-dismisses after 6s */}
+      {/* Onboarding controls panel — auto-dismisses after 11s */}
       <AnimatePresence>
         {showControls && (
+          <div style={{ position:"fixed", inset:0, display:"flex", alignItems:"center", justifyContent:"center", zIndex:50, pointerEvents:"none" }}>
           <motion.div
             initial={{ opacity:0, y:10 }}
             animate={{ opacity:1, y:0 }}
@@ -741,8 +742,7 @@ export default function Overworld() {
             transition={{ duration:0.4 }}
             onClick={() => setShowControls(false)}
             style={{
-              position:"fixed", top:"50%", left:"50%", transform:"translate(-50%, -50%)",
-              zIndex:50, cursor:"pointer",
+              pointerEvents:"auto", cursor:"pointer",
               background:"rgba(4,8,24,0.82)",
               backdropFilter:"blur(14px)",
               WebkitBackdropFilter:"blur(14px)",
@@ -778,6 +778,7 @@ export default function Overworld() {
               click to dismiss
             </p>
           </motion.div>
+          </div>
         )}
       </AnimatePresence>
 
@@ -904,11 +905,11 @@ export default function Overworld() {
         </motion.button>
       </div>}
 
-      {/* Mobile bottom buttons */}
+      {/* Mobile bottom buttons — left side to avoid D-pad overlap */}
       {isTouchDevice && (
         <div style={{
-          position:"fixed", bottom:24, left:"50%", transform:"translateX(-50%)",
-          display:"flex", gap:8, zIndex:49,
+          position:"fixed", bottom:24, left:16,
+          display:"flex", flexDirection:"column", gap:8, zIndex:51,
         }}>
           <motion.button
             onClick={() => setStarMapOpen(o => !o)}
