@@ -312,13 +312,14 @@ function StarMap({ planetImgs, onWarp, onClose }: {
   onWarp: (id: BuildingId) => void;
   onClose: () => void;
 }) {
+  const { theme } = useTheme();
   return (
     <motion.div
       initial={{ opacity:0 }} animate={{ opacity:1 }} exit={{ opacity:0 }}
       transition={{ duration:0.25 }}
       style={{
         position:"fixed", inset:0, zIndex:80,
-        background:"rgba(0,1,10,0.93)", backdropFilter:"blur(24px)", WebkitBackdropFilter:"blur(24px)",
+        background:theme.panel, backdropFilter:"blur(24px)", WebkitBackdropFilter:"blur(24px)",
         display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
         padding:"32px 20px", overflow:"auto",
       }}
@@ -332,7 +333,7 @@ function StarMap({ planetImgs, onWarp, onClose }: {
       >
         {/* Header */}
         <div style={{ textAlign:"center", marginBottom:32 }}>
-          <div style={{ fontFamily:"monospace", fontSize:9, color:"#00e5ff55", letterSpacing:"0.35em", marginBottom:10 }}>
+          <div style={{ fontFamily:"monospace", fontSize:9, color:`${theme.accent}88`, letterSpacing:"0.35em", marginBottom:10 }}>
             ◈ GALACTIC NAVIGATION SYSTEM
           </div>
           <div style={{ fontFamily:"monospace", fontSize:24, color:"#fff", letterSpacing:"0.12em", fontWeight:300 }}>
@@ -693,14 +694,14 @@ export default function Overworld() {
 
       {/* ── HUD ── */}
       <div className="fixed top-5 left-5" style={{
-        background:"rgba(4,8,20,0.88)",
+        background:theme.panel,
         backdropFilter:"blur(16px)",
         WebkitBackdropFilter:"blur(16px)",
-        border:"1px solid rgba(255,255,255,0.14)",
+        border:`1px solid ${theme.accent}30`,
         borderRadius:14, padding:"10px 18px",
         zIndex:40,
       }}>
-        <p style={{ fontSize:13, fontWeight:700, letterSpacing:"0.07em", color:"#fff", margin:0 }}>ROHINI RAJASIMMAN</p>
+        <p style={{ fontSize:13, fontWeight:700, letterSpacing:"0.07em", color:theme.text, margin:0 }}>ROHINI RAJASIMMAN</p>
       </div>
 
       {/* Near-planet hint */}
@@ -743,10 +744,10 @@ export default function Overworld() {
             onClick={() => setShowControls(false)}
             style={{
               pointerEvents:"auto", cursor:"pointer",
-              background:"rgba(4,8,24,0.82)",
+              background:theme.panel,
               backdropFilter:"blur(14px)",
               WebkitBackdropFilter:"blur(14px)",
-              border:"1px solid rgba(255,255,255,0.12)",
+              border:`1px solid ${theme.accent}25`,
               borderRadius:12, padding:"14px 22px",
               textAlign:"center",
             }}
@@ -881,9 +882,9 @@ export default function Overworld() {
           onClick={() => setStarMapOpen(o => !o)}
           whileHover={{ scale:1.05 }} whileTap={{ scale:0.97 }}
           style={{
-            background:"rgba(180,100,255,0.12)", backdropFilter:"blur(12px)",
-            border:"1px solid rgba(180,100,255,0.4)",
-            color:"#b87fff", fontFamily:"monospace",
+            background:`${theme.accent}1e`, backdropFilter:"blur(12px)",
+            border:`1px solid ${theme.accent}66`,
+            color:theme.accent, fontFamily:"monospace",
             fontSize:10, letterSpacing:"0.12em",
             padding:"9px 18px", cursor:"pointer", borderRadius:4,
           }}
@@ -894,9 +895,9 @@ export default function Overworld() {
           onClick={() => setCockpitOpen(true)}
           whileHover={{ scale:1.05 }} whileTap={{ scale:0.97 }}
           style={{
-            background:"rgba(0,229,255,0.12)", backdropFilter:"blur(12px)",
-            border:"1px solid rgba(0,229,255,0.4)",
-            color:"#00e5ff", fontFamily:"monospace",
+            background:`${theme.accent}1e`, backdropFilter:"blur(12px)",
+            border:`1px solid ${theme.accent}66`,
+            color:theme.accent, fontFamily:"monospace",
             fontSize:10, letterSpacing:"0.12em",
             padding:"9px 18px", cursor:"pointer", borderRadius:4,
           }}
@@ -915,9 +916,9 @@ export default function Overworld() {
             onClick={() => setStarMapOpen(o => !o)}
             whileTap={{ scale:0.95 }}
             style={{
-              background:"rgba(180,100,255,0.18)", backdropFilter:"blur(12px)",
-              border:"1px solid rgba(180,100,255,0.5)",
-              color:"#b87fff", fontFamily:"monospace",
+              background:`${theme.accent}2e`, backdropFilter:"blur(12px)",
+              border:`1px solid ${theme.accent}80`,
+              color:theme.accent, fontFamily:"monospace",
               fontSize:11, letterSpacing:"0.1em",
               padding:"10px 18px", cursor:"pointer", borderRadius:20,
             }}
@@ -928,9 +929,9 @@ export default function Overworld() {
             onClick={() => setCockpitOpen(true)}
             whileTap={{ scale:0.95 }}
             style={{
-              background:"rgba(0,229,255,0.18)", backdropFilter:"blur(12px)",
-              border:"1px solid rgba(0,229,255,0.5)",
-              color:"#00e5ff", fontFamily:"monospace",
+              background:`${theme.accent}2e`, backdropFilter:"blur(12px)",
+              border:`1px solid ${theme.accent}80`,
+              color:theme.accent, fontFamily:"monospace",
               fontSize:11, letterSpacing:"0.1em",
               padding:"10px 18px", cursor:"pointer", borderRadius:20,
             }}
